@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Models\Specialization;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -39,12 +40,29 @@ class RegisteredUserController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'role' => $request->role,
+            'phone' => $request->phone,
         ]);
 
         event(new Registered($user));
 
         Auth::login($user);
 
-        return redirect(route('dashboard', absolute: false));
+        if(Auth::user()->role ==('doctor')) {
+        return redirect(route('doc_details'));
+        }
+        return redirect(route('pat_details'));
     }
+
+    public function add_details(){
+
+        if(Auth::user()->role ==('doctor')) {
+            $specializations = Specialization::all();
+            return view('doctor.doc_details', compact('specializations'));
+        }
+        elseif(Auth::user()->role == 'patient') {
+        return view('patient.pat_details');
+        }
+    }
+
 }

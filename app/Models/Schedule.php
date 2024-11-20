@@ -9,4 +9,6 @@ class Schedule extends Model
 {
     /** @use HasFactory<\Database\Factories\ScheduleFactory> */
     use HasFactory;
+
+    protected  $guarded = [];
 }

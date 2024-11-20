@@ -3,7 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Appointment;
+use App\Models\Doctor;
+use App\Models\Service;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class AppointmentController extends Controller
 {
@@ -12,7 +15,7 @@ class AppointmentController extends Controller
      */
     public function index()
     {
-        //
+        
     }
 
     /**
@@ -20,7 +23,9 @@ class AppointmentController extends Controller
      */
     public function create()
     {
-        //
+        $doctors = Doctor::with('user')->get();
+        $services = Service::all();
+        return view('appointment.create',compact('doctors','services'));
     }
 
     /**
@@ -28,7 +33,16 @@ class AppointmentController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $appointement = new Appointment();
+        $appointement->patient_id = Auth::user()->id;
+        $appointement->doctor_id = $request->doctor_id;
+        $appointement->service_id = $request->service_id;
+        $appointement->date = $request->date;
+        $appointement->start_time = $request->start_time;
+        $appointement->end_time = $request->end_time;
+        $appointement->description = $request->description;
+        $appointement->save();
+        return redirect()->route('dashboard');
     }
 
     /**

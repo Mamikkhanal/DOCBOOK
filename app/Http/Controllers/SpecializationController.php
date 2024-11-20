@@ -2,18 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Doctor;
+use App\Models\Specialization;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
-class DoctorController extends Controller
+class SpecializationController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        
+        //
     }
 
     /**
@@ -29,19 +28,13 @@ class DoctorController extends Controller
      */
     public function store(Request $request)
     {
-        $doctor = new Doctor();
-        $doctor->user_id = Auth::user()->id;
-        $doctor->specialization = $request->specialization;
-        $doctor->save();
-
-        return redirect("dashboard");
-
+        //
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(Doctor $doctor)
+    public function show(Specialization $specialization)
     {
         //
     }
@@ -49,7 +42,7 @@ class DoctorController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Doctor $doctor)
+    public function edit(Specialization $specialization)
     {
         //
     }
@@ -57,7 +50,7 @@ class DoctorController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Doctor $doctor)
+    public function update(Request $request, Specialization $specialization)
     {
         //
     }
@@ -65,7 +58,7 @@ class DoctorController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Doctor $doctor)
+    public function destroy(Specialization $specialization)
     {
         //
     }

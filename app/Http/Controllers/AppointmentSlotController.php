@@ -20,7 +20,7 @@ class AppointmentSlotController extends Controller
      */
     public function create()
     {
-        //
+        
     }
 
     /**
