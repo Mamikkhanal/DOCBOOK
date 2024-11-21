@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('payments', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('appointent_id')->references('id')->on('appointments');
+            $table->foreignId('appointment_id')->references('id')->on('appointments');
             $table->foreignId('service_id')->references('id')->on('services');
             $table->float('amount');
             $table->timestamps();

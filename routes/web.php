@@ -13,6 +13,16 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::middleware('IsPatient')->group(function () {
+    Route::get('/appointment/create', [AppointmentController::class,'create'])->name('appointment.create');
+    Route::post('/appointment/store', [AppointmentController::class,'store'])->name('appointment.store');     
+});
+
+Route::middleware([IsDoctor::class])->group(function () {
+    Route::get('/appointment/edit/{appointment}', [AppointmentController::class,'edit'])->name('appointment.edit');  
+    Route::put('/appointment/update/{id}', [AppointmentController::class,'update'])->name('appointment.update');      
+});
+
 Route::middleware(['auth','verified'])->group(function () {
 
     Route::get('/doc_details', [RegisteredUserController::class,'add_details'])->name('doc_details');
@@ -21,21 +31,14 @@ Route::middleware(['auth','verified'])->group(function () {
     Route::get('/pat_details', [RegisteredUserController::class,'add_details'])->name('pat_details');
     Route::post('/patient/store', [PatientController::class,'store'])->name('patient.store');
 
-});
+    Route::get('/appointment', [AppointmentController::class,'index'])->name('appointment.index');
+    Route::get('/appointment/{appointment}', [AppointmentController::class,'show'])->name('appointment.show');
+    Route::delete ('/appointment/delete/{appointment}', [AppointmentController::class,'destroy'])->name('appointment.destroy');
 
-Route::middleware([IsPatient::class])->group(function () {
-    Route::post('/appointment/create', [AppointmentController::class,'create'])->name('appointment.create');    
-});
-
-Route::middleware([IsDoctor::class])->group(function () {
-    Route::post('/appointment/edit', [AppointmentController::class,'edit'])->name('appointment.edit');    
+    Route::get('/dashboard', [AppointmentController::class ,'dashboard'])->name('dashboard');
 });
 
 
-
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

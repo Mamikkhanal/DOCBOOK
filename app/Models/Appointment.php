@@ -12,15 +12,15 @@ class Appointment extends Model
 
     protected  $guarded = [];
 
-    public function doctors(){
+    public function doctor(){
         return $this->belongsTo(Doctor::class);
     }
 
-    public function patients(){
+    public function patient(){
         return $this->belongsTo(Patient::class);
     }
 
-    public function services(){
+    public function service(){
         return $this->belongsTo(Service::class);
     }
 }
