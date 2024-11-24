@@ -1,4 +1,4 @@
-<nav x-data="{ open: false }" class="bg-white border-b border-gray-100">
+<nav x-data="{ open: false }" class="bg-gradient-to-br from-blue-900 to-blue-900 text-white border-b border-gray-100">
     <!-- Primary Navigation Menu -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
@@ -15,6 +15,41 @@
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                         {{ __('Dashboard') }}
                     </x-nav-link>
+
+                    @if(Auth::user()->role == 'admin')
+                        <x-nav-link :href="route('review.index')" :active="request()->routeIs('review.index')">
+                            Reviews
+                        </x-nav-link>
+                        <x-nav-link :href="route('specialization.index')" :active="request()->routeIs('specialization.index')">
+                            Specializations
+                        </x-nav-link>
+                        <x-nav-link :href="route('service.index')" :active="request()->routeIs('service.index')">
+                            Services
+                        </x-nav-link>
+                        @elseif(Auth::user()->role == 'patient')
+                            <x-nav-link :href="route('review.index')" :active="request()->routeIs('review.index')">
+                                Reviews
+                            </x-nav-link>
+                            <x-nav-link :href="route('appointment.create')" :active="request()->routeIs('appointment.create')">
+                               Take an appointment
+                            </x-nav-link>
+                        @elseif(Auth::user()->role == 'doctor')
+                            <x-nav-link :href="route('review.index')" :active="request()->routeIs('review.index')">
+                                Reviews
+                            </x-nav-link>
+                            <x-nav-link :href="route('schedule.index')" :active="request()->routeIs('schedule.index')">
+                                Schedules
+                            </x-nav-link>
+                            {{-- <x-nav-link :href="route('doctors')" :active="request()->routeIs('doctors')">
+                                Doctors
+                            </x-nav-link>
+                            <x-nav-link :href="route('patients')" :active="request()->routeIs('patients')">
+                                Patients
+                            </x-nav-link>
+                            <x-nav-link :href="route('admins')" :active="request()->routeIs('admins')">
+                                Admins
+                            </x-nav-link> --}}
+                        @endif
                 </div>
             </div>
 

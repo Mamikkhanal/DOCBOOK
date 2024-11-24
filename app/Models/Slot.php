@@ -5,11 +5,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Schedule extends Model
+class Slot extends Model
 {
-    /** @use HasFactory<\Database\Factories\ScheduleFactory> */
+    /** @use HasFactory<\Database\Factories\SlotFactory> */
     use HasFactory;
-
     protected  $guarded = [];
 
     protected $casts = [
@@ -18,12 +17,12 @@ class Schedule extends Model
         'end_time' => 'datetime:H:i',
     ];
 
-    public function doctor()
-    {
-        return $this->belongsTo(Doctor::class);
+    public function appointment(){
+        return $this->belongsTo(Appointment::class);
     }
 
-    public function slots(){
-        return $this->hasMany(Slot::class);
+    public function schedule(){
+        return $this->belongsTo(Schedule::class);
     }
+    
 }

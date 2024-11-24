@@ -11,6 +11,12 @@ class Appointment extends Model
     use HasFactory;
 
     protected  $guarded = [];
+    protected $casts = [
+        'date' => 'datetime:d-m-Y',
+        'start_time' => 'datetime:H:i', // Cast to time format
+        'end_time' => 'datetime:H:i',
+    ];
+    
 
     public function doctor(){
         return $this->belongsTo(Doctor::class);
@@ -22,5 +28,9 @@ class Appointment extends Model
 
     public function service(){
         return $this->belongsTo(Service::class);
+    }
+
+    public function slot(){
+        return $this->hasOne(Slot::class);
     }
 }

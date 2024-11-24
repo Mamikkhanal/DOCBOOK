@@ -63,6 +63,9 @@ class RegisteredUserController extends Controller
         elseif(Auth::user()->role == 'patient') {
         return view('patient.pat_details');
         }
+        else{
+            return view('welcome');
+        }
     }
 
 }

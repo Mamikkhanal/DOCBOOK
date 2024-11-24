@@ -12,6 +12,7 @@ class Specialization extends Model
 
     protected  $guarded = [];
 
+
     public function doctors(){
         return $this->belongsToMany(Doctor::class);
     }

@@ -4,7 +4,7 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <title>Laravel</title>
+        <title>DOCBOOK</title>
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
@@ -19,41 +19,95 @@
             </style>
         @endif
     </head>
-    <body class="bg-gray-100 text-gray-800 h-screen overflow-y-hidden">
+    <body class="bg-gray-100 text-gray-800 h-screen overflow-y-scroll">
         @if (Route::has('login'))
             <nav class="flex justify-between p-4 bg-white shadow-md">
-                <h1 class="text-3xl font-strong position-absolute mx-24 text-gray-800 ">DOC-BOOK</h1>
-                <div>
+                <h1 class="text-3xl font-extrabold position-absolute mx-24 text-blue-800">DOC-BOOK</h1>
                 @auth
                     <a
                         href="{{ url('/dashboard') }}"
-                        class="px-4 py-2 text-sm font-medium text-gray-800 transition duration-300 rounded-lg hover:bg-gray-200 focus:outline-none focus:ring focus:ring-red-400 dark:text-gray-200 dark:hover:bg-gray-700"
+                        class="px-4 py-2 text-sm font-medium text-gray-800 transition duration-300 rounded-lg bg-blue-800 focus:outline-none focus:ring focus:ring-red-400 dark:text-gray-200 dark:hover:bg-gray-700"
                     >
                         Dashboard
                     </a>
                 @else
+                <div class="flex inline">
+                    <div class="hover:scale-110 transition duration-300 ease-in-out">
                     <a
                         href="{{ route('login') }}"
-                        class="ml-4 px-4 py-2 text-sm font-medium text-white bg-blue-800 rounded-lg shadow hover:bg-blue-600 focus:outline-none focus:ring focus:ring-blue-400"
+                        class="ml-4 px-4 py-2 text-sm font-medium text-white bg-blue-800 rounded-lg shadow dark:hover:bg-gray-700 focus:outline-none focus:ring focus:ring-blue-400"
                     >
                         Log in
                     </a>
+                    </div>
                     @if (Route::has('register'))
+                    <div class="hover:scale-110 transition duration-300 ease-in-out">
                         <a
                             href="{{ route('register') }}"
-                            class="ml-4 px-4 py-2 text-sm font-medium text-white bg-blue-800 rounded-lg shadow hover:bg-blue-600 focus:outline-none focus:ring focus:ring-blue-400"
+                            class="ml-4 px-4 py-2 text-sm font-medium text-white bg-blue-800 rounded-lg shadow dark:hover:bg-gray-700 focus:outline-none focus:ring focus:ring-blue-400"
                         >
                             Register
                         </a>
+                    </div>
                     @endif
+                </div>
                 @endauth
                 </div>
             </nav>
         @endif
 
-    <div class="flex flex-col items-center min-h-screen pt-6 sm:justify-center sm:pt-0">
-        <img src="{{ asset('images/welcome.jpg') }}" alt="Logo" class="min-h-screen max-h-screen">
-    </div>
+        <div class="relative flex flex-col items-center pt-6 sm:justify-center sm:pt-0 min-h-60 mt-8">
+            <img src="{{ asset('images/welcome_image.jpg') }}" alt="Logo" class="w-[55%] h-72 absolute left-[14%] ">
+            
+            <!-- Button Overlay -->
+            <div class="absolute top-40 left-[80%] transform -translate-x-1/2 -translate-y-1/2 transform scale-100 hover:scale-110 transition duration-300 ease-in-out">
+                <a href="{{ route('login') }}" class="px-4 py-4 text-sm font-medium text-blue-800 bg-white rounded-2xl shadow border-4 border-blue-800 focus:outline-none focus:ring focus:ring-blue-400">
+                    Take an Appointment
+                </a>
+            </div>
+        </div>
+
+        <footer class="bg-gray-100 text-gray-800 py-8">
+            <div class="flex-col items-center justify-center max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-20 ml-36">
+                
+                <!-- Contact Us Section -->
+                <div>
+                  <h4 class="text-lg font-semibold text-blue-600">Contact Us</h4>
+                  <p class="mt-2 text-sm">Pokhara Marga, Pokhara, Nepal</p>
+                  <p class="text-sm">Phone: +977 9876543210</p>
+                  <p class="text-sm">Email: <a href="" class="text-blue-500 hover:underline">contact@docbook.com</a></p>
+                </div>
+          
+                <!-- Clinic Hours Section -->
+                <div>
+                  <h4 class="text-lg font-semibold text-blue-600">Clinic Hours</h4>
+                  <p class="mt-2 text-sm">Sun - Thu: 8:00 AM - 8:00 PM</p>
+                  <p class="text-sm">Fri: 9:00 AM - 5:00 PM</p>
+                  <p class="text-sm">Sat: Closed</p>
+                </div>
+          
+                <!-- Quick Links Section -->
+                <div>
+                  <h4 class="text-lg font-semibold text-blue-600">Quick Links</h4>
+                  <ul class="mt-2 space-y-2 text-sm">
+                    <li><a href="#" class="text-blue-500 hover:underline">Our Services</a></li>
+                    <li><a href="#" class="text-blue-500 hover:underline">About Us</a></li>
+                    <li><a href="#" class="text-blue-500 hover:underline">Contact</a></li>
+                    <li><a href="#" class="text-blue-500 hover:underline">Book Appointment</a></li>
+                  </ul>
+                </div>
+                
+              </div>
+          
+              <!-- Footer Bottom -->
+              <div class="bg-gradient-to-br from-stone-300 to-stone-400  text-white mt-8 border-t border-gray-300 pt-4 text-center">
+                <p class="text-sm text-white">&copy; 2024 DOCBOOK. All rights reserved.</p>
+              </div>
+            </div>
+          </footer>
+          
+        
     </body>
     
 </html>

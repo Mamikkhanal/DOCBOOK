@@ -21,10 +21,10 @@ class Doctor extends Model
         return $this->hasMany(Appointment::class);
     }
 
-    public function appointmentslots(){
-        return $this->hasMany(AppointmentSlot::class);
+    public function schedule()
+    {
+        return $this->hasMany(Schedule::class);
     }
-
     public function specializations(){
         return $this->hasOne(Specialization::class);
     }

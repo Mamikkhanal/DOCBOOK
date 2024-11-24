@@ -24,25 +24,25 @@
                     <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
                         <div class="bg-white overflow-hidden shadow-lg sm:rounded-lg">
                             <div class="p-6 text-blue-900">
-                                <h1 class="text-2xl font-semibold mb-6">My Appointments</h1>
+                                <h1 class="text-2xl font-semibold mb-6">Appointment</h1>
                                 
-                                @if($appointments->isEmpty())
+                                {{-- @if($appointments->isEmpty())
                                     <p class="text-gray-500">You have no appointments.</p>
-                                @else
+                                @else --}}
                                     <table class="min-w-full bg-white border border-gray-300 rounded-lg shadow-md">
                                         <thead>
-                                            <tr class="bg-blue-700 text-left text-sm font-medium text-white">
-                                                <th class="py-2 px-4">Doctor</th>
-                                                <th class="py-2 px-4">Service</th>
-                                                <th class="py-2 px-4">Date</th>
-                                                <th class="py-2 px-4">Time</th>
-                                                <th class="py-2 px-4">Reason</th>
-                                                <th class="py-2 px-4">Actions</th>
-                                                <th class="py-2 px-4">Status</th>
+                                            <tr class="bg-gradient-to-br from-stone-300 to-stone-400 text-left text-md font-medium text-blue-800">
+                                                <th class="py-4 px-4">Doctor</th>
+                                                <th class="py-4 px-4">Service</th>
+                                                <th class="py-4 px-4">Date</th>
+                                                <th class="py-4 px-4">Time</th>
+                                                <th class="py-4 px-4">Reason</th>
+                                                <th class="py-4 px-4">Actions</th>
+                                                <th class="py-4 px-4">Status</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @foreach($appointments as $appointment)
+                                            {{-- @foreach($appointments as $appointment) --}}
                                                 <tr class="hover:bg-gray-50">
                                                     <td class="py-3 px-4 text-sm text-gray-700">{{ $appointment->doctor->user->name }}</td>
                                                     <td class="py-3 px-4 text-sm text-gray-700">{{ $appointment->service->name }}</td>
@@ -75,10 +75,10 @@
 
                                                     </td>
                                                 </tr>
-                                            @endforeach
+                                            {{-- @endforeach --}}
                                         </tbody>
                                     </table>
-                                @endif
+                                {{-- @endif --}}
                             </div>
                         </div>
                     </div>

@@ -12,7 +12,8 @@ class SpecializationController extends Controller
      */
     public function index()
     {
-        //
+        $specializations = Specialization::all();
+        return view("specialization.index", compact("specializations"));
     }
 
     /**
@@ -20,16 +21,27 @@ class SpecializationController extends Controller
      */
     public function create()
     {
-        //
+        return view("specialization.create");
     }
 
     /**
      * Store a newly created resource in storage.
      */
+
     public function store(Request $request)
     {
-        //
+
+        $request->validate([
+            'name' => 'required|string|max:255|unique:specializations,name',
+        ]);
+
+        Specialization::create([
+            'name' => $request->name,
+        ]);
+
+        return redirect()->route('specialization.index')->with('success', 'Specialization added successfully!');
     }
+
 
     /**
      * Display the specified resource.
@@ -44,7 +56,7 @@ class SpecializationController extends Controller
      */
     public function edit(Specialization $specialization)
     {
-        //
+        return view('specialization.edit', compact('specialization'));
     }
 
     /**
@@ -52,7 +64,9 @@ class SpecializationController extends Controller
      */
     public function update(Request $request, Specialization $specialization)
     {
-        //
+        $specialization->name = $request->name;
+        $specialization->save();
+        return redirect()->route('specialization.index');
     }
 
     /**
@@ -60,6 +74,7 @@ class SpecializationController extends Controller
      */
     public function destroy(Specialization $specialization)
     {
-        //
+        $specialization->delete();
+        return redirect()->route('specialization.index');
     }
 }
