@@ -62,6 +62,20 @@
                                     @endif                       
                             </form> 
                             @endif
+                            @if($appointment->status == 'booked' && $appointment->payment->status == 'unpaid')
+                            <form action="{{ route('esewaPay', $appointment) }}" method="POST" class="inline float-right">
+                                @csrf
+                                <input type="hidden" name="appointment_id" value="{{ $appointment->id }}">
+                                <button type="submit" class="bg-yellow-200 w-16 p-2 rounded-xl text-red-600 text-sm">
+                                    Pay
+                                </button>
+                                    @if (@session('payment'))
+                                        <p class="text-sm text-green-600 mt-2">{{ session('payment') }}</p>
+                                    @endif                      
+                            </form>
+                            @elseif($appointment->status == 'booked' && $appointment->payment->status == 'paid')
+                                <p class="inline float-right w-16 text-center bg-green-600 p-2 rounded-xl text-white text-sm">Paid</p>
+                            @endif
                             <span class="px-2 py-1 text-xs font-semibold inline-block rounded-full 
                                {{ $appointment->status == 'completed' ? 'bg-green-100 text-green-600' : 
                                 ($appointment->status == 'pending' ? 'bg-yellow-100 text-yellow-600' : 

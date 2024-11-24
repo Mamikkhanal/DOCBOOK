@@ -62,6 +62,9 @@ class ServiceController extends Controller
     public function update(Request $request, Service $service)
     {
         $service->name = $request->name;
+        $service->description = $request->description;
+        $service->category = $request->category;
+        $service->price = $request->price;
         $service->save();
         return redirect()->route('service.index');
     }

@@ -68,4 +68,15 @@ class RegisteredUserController extends Controller
         }
     }
 
+    public function admins(){
+        $admins = User::where('role', 'admin')->get();
+        return view('admin.admins', compact('admins'));
+    }
+
+    public function adminsDelete($id){
+        $admin = User::find($id);
+        $admin->delete();
+        return redirect()->route('admins');
+    }
+
 }

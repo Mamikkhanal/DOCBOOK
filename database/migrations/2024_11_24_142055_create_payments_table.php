@@ -13,9 +13,12 @@ return new class extends Migration
     {
         Schema::create('payments', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')->references('id')->on('users');
             $table->foreignId('appointment_id')->references('id')->on('appointments');
             $table->foreignId('service_id')->references('id')->on('services');
+            $table->string('pid')->nullable();
             $table->float('amount');
+            $table->enum('status',['paid','unpaid'])->default('unpaid');
             $table->timestamps();
         });
     }

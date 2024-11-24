@@ -9,6 +9,7 @@ use App\Http\Controllers\SlotController;
 use App\Http\Controllers\DoctorController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\PatientController;
+use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\ScheduleController;
@@ -20,13 +21,16 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+
 Route::middleware('IsAdmin')->group(function () {
     Route::resource('/specialization', SpecializationController::class);
     Route::resource('/service', ServiceController::class);
+    Route::get('/admins', [RegisteredUserController::class,'admins'])->name('admins');
+    Route::delete('/admins/delete/{id}', [RegisteredUserController::class,'adminsDelete'])->name('adminsDelete');
 });
 
 Route::middleware('IsPatient')->group(function () {
-
+    
     Route::get('/pat_details', [RegisteredUserController::class,'add_details'])->name('pat_details');
     Route::post('/patient/store', [PatientController::class,'store'])->name('patient.store');
     
@@ -48,7 +52,7 @@ Route::middleware('IsDoctor')->group(function () {
     
     Route::get('/doc_details', [RegisteredUserController::class,'add_details'])->name('doc_details');
     Route::post('/doctor/store', [DoctorController::class,'store'])->name('doctor.store');
-
+    
     Route::get ('/schedule',[ScheduleController::class,'index'])->name('schedule.index');
     Route::get ('schedule/create', [ScheduleController::class,'create'])->name('schedule.create');
     Route::post ('schedule/store', [ScheduleController::class,'store'])->name('schedule.store');
@@ -59,7 +63,7 @@ Route::middleware('IsDoctor')->group(function () {
 });
 
 Route::middleware(['auth','verified'])->group(function () {
-
+    
     Route::get('/appointment', [AppointmentController::class,'index'])->name('appointment.index');
     Route::get('/appointment/{id}', [AppointmentController::class,'show'])->name('appointment.show');
     Route::delete ('/appointment/delete/{id}', [AppointmentController::class,'destroy'])->name('appointment.destroy');
@@ -67,17 +71,25 @@ Route::middleware(['auth','verified'])->group(function () {
     Route::get('/dashboard', [AppointmentController::class ,'dashboard'])->name('dashboard');
     
     Route::get('/review',[ReviewController::class,'index'])->name('review.index');
+
+    Route::post('/esewaPay{appointment}', [PaymentController::class,'esewaPay'])->name('esewaPay');
+    Route::get ('/success',[PaymentController::class,'esewaPaySuccess'])->name('payment.success');
+    Route::get ('/failure',[PaymentController::class,'esewaPayFailure'])->name('payment.failure');
 }); 
 
 Route::middleware('auth')->group(function () {
+
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
 Route::middleware(['IsDoctorOrAdmin'])->group(function () {
+
     Route::get('/appointment/edit/{id}', [AppointmentController::class,'edit'])->name('appointment.edit');  
     Route::put('/appointment/update/{id}', [AppointmentController::class,'update'])->name('appointment.update'); 
+    
+    Route::get('/payment/create{appointment}', [PaymentController::class,'create'])->name('payment.create');
 });
 
 

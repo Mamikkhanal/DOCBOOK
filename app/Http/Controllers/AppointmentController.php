@@ -6,12 +6,13 @@ use Carbon\Carbon;
 use App\Models\Slot;
 use App\Models\Doctor;
 use App\Models\Patient;
+use App\Models\Payment;
 use App\Models\Service;
+
 use App\Models\Schedule;
-
 use App\Models\Appointment;
-use Illuminate\Http\Request;
 
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class AppointmentController extends Controller
@@ -26,6 +27,7 @@ class AppointmentController extends Controller
             $appointments = Appointment::with(['patient.user', 'service'])
             ->orderBy("created_at", "desc")
             ->where('patient_id',$patient_id )
+            ->with('payment')
             ->get();
         } 
         elseif(Auth::user()->role == 'doctor') {
@@ -33,13 +35,13 @@ class AppointmentController extends Controller
             $appointments = Appointment::with(['doctor.user', 'service'])
             ->orderBy("created_at", "desc")
             ->where('doctor_id', $doctor_id )
+            ->with('payment')
             ->get();
         }
         else{
-            $appointments = Appointment::all();
+            $appointments = Appointment::with('payment')->get();
             $appointments = $appointments->sortByDesc("created_at");
         }
-
         return view('appointment.index',compact('appointments'));
         
     }
@@ -200,6 +202,9 @@ class AppointmentController extends Controller
             $appointment->status = $request->status;
             $appointment->description = $request->description;
             $appointment->save();
+        }
+        if($appointment->status == 'booked') {
+            return redirect()->route('payment.create',['appointment' => $appointment->id]);
         }
 
         return redirect()->route('dashboard');

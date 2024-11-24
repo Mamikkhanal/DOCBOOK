@@ -33,4 +33,8 @@ class Appointment extends Model
     public function slot(){
         return $this->hasOne(Slot::class);
     }
+
+    public function payment(){
+        return $this->hasOne(Payment::class);
+    }
 }

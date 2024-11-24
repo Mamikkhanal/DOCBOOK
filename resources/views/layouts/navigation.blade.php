@@ -6,7 +6,7 @@
                 <!-- Logo -->
                 <div class="shrink-0 flex items-center">
                     <a href="{{ route('dashboard') }}">
-                        <x-application-logo class="block h-9 w-auto fill-current text-gray-800" />
+                        <x-application-logo class="block h-9 w-auto fill-current text-white" />
                     </a>
                 </div>
 
@@ -26,6 +26,16 @@
                         <x-nav-link :href="route('service.index')" :active="request()->routeIs('service.index')">
                             Services
                         </x-nav-link>
+                        <x-nav-link :href="route('admins')" :active="request()->routeIs('admins')">
+                            Admins
+                        </x-nav-link>
+                        {{-- <x-nav-link :href="route('doctors')" :active="request()->routeIs('doctors')">
+                            Doctors
+                        </x-nav-link>
+                        <x-nav-link :href="route('patients')" :active="request()->routeIs('patients')">
+                            Patients
+                        </x-nav-link>
+                        --}}
                         @elseif(Auth::user()->role == 'patient')
                             <x-nav-link :href="route('review.index')" :active="request()->routeIs('review.index')">
                                 Reviews
@@ -40,15 +50,6 @@
                             <x-nav-link :href="route('schedule.index')" :active="request()->routeIs('schedule.index')">
                                 Schedules
                             </x-nav-link>
-                            {{-- <x-nav-link :href="route('doctors')" :active="request()->routeIs('doctors')">
-                                Doctors
-                            </x-nav-link>
-                            <x-nav-link :href="route('patients')" :active="request()->routeIs('patients')">
-                                Patients
-                            </x-nav-link>
-                            <x-nav-link :href="route('admins')" :active="request()->routeIs('admins')">
-                                Admins
-                            </x-nav-link> --}}
                         @endif
                 </div>
             </div>
