@@ -62,8 +62,9 @@ class AppointmentController extends Controller
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
-    {
-        $validated = $request->validate([
+    {   
+        $request->validate([
+            'date' => 'required',
             'start_time' => 'required',
             'end_time' => 'required|after:start_time',
             'description' => 'required',
