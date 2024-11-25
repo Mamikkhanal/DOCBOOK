@@ -11,6 +11,9 @@
         <div class="bg-white rounded-xl shadow-xl overflow-hidden">
             <!-- Header -->
             <div class="bg-gradient-to-br from-stone-300 to-stone-400 px-8 py-6">
+                <x-nav-link :href="route('dashboard')" :active="request()->routeIs('appointment.index')">
+                    Index
+                </x-nav-link>
                 @if(Auth::user()->role == 'admin')
                 <h1 class="text-2xl font-bold text-blue-800 text-center">
                     All Appointments
@@ -27,6 +30,22 @@
                 </p>
                 @endif
             </div>
+
+            <div class="px-8 py-4">
+                <form method="GET" action="{{ route('appointment.index') }}" class="flex space-x-2">
+                    <input 
+                        type="text" 
+                        name="search" 
+                        value="{{ request('search') }}" 
+                        placeholder="Search by Doctor, Patient, or Service..." 
+                        class="flex-grow px-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring focus:ring-blue-300"
+                    >
+                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700">
+                        Search
+                    </button>
+                </form>
+            </div>
+            
 
             <!-- Appointment List -->
             <div class="px-8 py-6">

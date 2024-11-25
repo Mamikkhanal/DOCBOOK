@@ -20,29 +20,56 @@ class AppointmentController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        if(Auth::user()->role == "patient") {
-            $patient_id = Patient::where('user_id',Auth::user()->id)->first()->id;
-            $appointments = Appointment::with(['patient.user', 'service'])
-            ->where('patient_id',$patient_id )
-            ->with('payment')
-            ->orderBy("id", "desc")
-            ->get();
-        } 
-        elseif(Auth::user()->role == 'doctor') {
-            $doctor_id = Doctor::where('user_id',Auth::user()->id)->first()->id;
-            $appointments = Appointment::with(['doctor.user', 'service'])
-            ->where('doctor_id', $doctor_id )
-            ->with('payment')
-            ->orderBy("id", "desc")
-            ->get();
+        // if(Auth::user()->role == "patient") {
+        //     $patient_id = Patient::where('user_id',Auth::user()->id)->first()->id;
+        //     $appointments = Appointment::with(['patient.user', 'service'])
+        //     ->where('patient_id',$patient_id )
+        //     ->with('payment')
+        //     ->orderBy("id", "desc")
+        //     ->get();
+        // } 
+        // elseif(Auth::user()->role == 'doctor') {
+        //     $doctor_id = Doctor::where('user_id',Auth::user()->id)->first()->id;
+        //     $appointments = Appointment::with(['doctor.user', 'service'])
+        //     ->where('doctor_id', $doctor_id )
+        //     ->with('payment')
+        //     ->orderBy("id", "desc")
+        //     ->get();
+        // }
+        // else{
+        //     $appointments = Appointment::with('payment')
+        //     ->orderBy("id", "desc")
+        //     ->get();
+        // }
+
+        $query = Appointment::with(['doctor.user', 'patient.user', 'service', 'payment']);
+
+        if (Auth::user()->role == 'patient') {
+            $patient_id = Patient::where('user_id', Auth::id())->first()->id;
+            $query->where('patient_id', $patient_id);
+        } elseif (Auth::user()->role == 'doctor') {
+            $doctor_id = Doctor::where('user_id', Auth::id())->first()->id;
+            $query->where('doctor_id', $doctor_id);
         }
-        else{
-            $appointments = Appointment::with('payment')
-            ->orderBy("id", "desc")
-            ->get();
+
+        if ($request->has('search') && $request->search != '') {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->whereHas('doctor.user', function ($subQuery) use ($search) {
+                    $subQuery->where('name', 'LIKE', "%{$search}%");
+                })
+                ->orWhereHas('patient.user', function ($subQuery) use ($search) {
+                    $subQuery->where('name', 'LIKE', "%{$search}%");
+                })
+                ->orWhereHas('service', function ($subQuery) use ($search) {
+                    $subQuery->where('name', 'LIKE', "%{$search}%");
+                });
+            });
         }
+        $appointments = $query->orderBy('id', 'desc')->get();
+
         return view('appointment.index',compact('appointments'));
         
     }
