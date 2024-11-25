@@ -1,4 +1,4 @@
-<div class="max-w-lg mx-auto mt-10 p-6 rounded-lg ">
+<div class="max-w-3xl mx-auto mt-5 p-6 rounded-lg ">
     @if(session('success'))
         <div class="mb-4 text-green-500 font-semibold">
             {{ session('success') }}

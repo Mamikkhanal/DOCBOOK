@@ -13,7 +13,8 @@ class PatientController extends Controller
      */
     public function index()
     {
-        //
+        $patients = Patient::with("user")->get();
+        return view("admin.patients", compact("patients"));
     }
 
     /**
@@ -65,6 +66,6 @@ class PatientController extends Controller
      */
     public function destroy(Patient $patient)
     {
-        //
+
     }
 }

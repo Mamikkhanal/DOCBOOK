@@ -25,22 +25,23 @@ class AppointmentController extends Controller
         if(Auth::user()->role == "patient") {
             $patient_id = Patient::where('user_id',Auth::user()->id)->first()->id;
             $appointments = Appointment::with(['patient.user', 'service'])
-            ->orderBy("created_at", "desc")
             ->where('patient_id',$patient_id )
             ->with('payment')
+            ->orderBy("id", "desc")
             ->get();
         } 
         elseif(Auth::user()->role == 'doctor') {
             $doctor_id = Doctor::where('user_id',Auth::user()->id)->first()->id;
             $appointments = Appointment::with(['doctor.user', 'service'])
-            ->orderBy("created_at", "desc")
             ->where('doctor_id', $doctor_id )
             ->with('payment')
+            ->orderBy("id", "desc")
             ->get();
         }
         else{
-            $appointments = Appointment::with('payment')->get();
-            $appointments = $appointments->sortByDesc("created_at");
+            $appointments = Appointment::with('payment')
+            ->orderBy("id", "desc")
+            ->get();
         }
         return view('appointment.index',compact('appointments'));
         
@@ -87,6 +88,10 @@ class AppointmentController extends Controller
             
         }
         else{
+            $appointmentDate = Carbon::parse($appointment->date);
+            if($appointmentDate<Carbon::now()){
+                return redirect()->route('appointment.create')->withErrors('Date must be after current date');
+            }
             foreach ($schedules as $schedule) {
                 
                 $scheduleDate = Carbon::parse($schedule->date);
@@ -99,6 +104,13 @@ class AppointmentController extends Controller
                 
                     $appointmentStartTime = Carbon::parse($appointment->start_time);
                     $appointmentEndTime = Carbon::parse($appointment->end_time);
+
+                    if($appointmentStartTime<Carbon::now() || $appointmentEndTime<Carbon::now()){
+                        return redirect()->route('appointment.create')->withErrors('Appointment time must be after current time.');
+                    }
+                    if($appointmentStartTime > $appointmentEndTime){
+                        return redirect()->route('appointment.create')->withErrors('Start time must be before end time.');
+                    }
                     // $appointmentStartTime =$appointment->start_time;
                     // $appointmentEndTime = $appointment->end_time;
                 

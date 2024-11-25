@@ -38,7 +38,7 @@
                     <div class="space-y-6">
                         @foreach($appointments as $appointment)
                         <div class="border rounded-lg p-6 shadow-sm bg-gray-50">
-                            <h2 class="inline text-lg font-bold text-gray-800">
+                            <h2 class="inline text-lg font-bold text-blue-800">
                                 @if(Auth::user()->role == 'patient')
                                 Appointment with Dr. {{ $appointment->doctor->user->name }}
                                 @elseif(Auth::user()->role == 'doctor')
@@ -66,24 +66,25 @@
                             <form action="{{ route('esewaPay', $appointment) }}" method="POST" class="inline float-right">
                                 @csrf
                                 <input type="hidden" name="appointment_id" value="{{ $appointment->id }}">
-                                <button type="submit" class="bg-yellow-200 w-16 p-2 rounded-xl text-red-600 text-sm">
+                                <button type="submit" class="bg-yellow-300 hover:bg-yellow-400 w-16 px-2 py-1 rounded-xl text-red-600 text-xs font-semibold">
                                     Pay
                                 </button>
                                     @if (@session('payment'))
                                         <p class="text-sm text-green-600 mt-2">{{ session('payment') }}</p>
                                     @endif                      
                             </form>
-                            @elseif($appointment->status == 'booked' && $appointment->payment->status == 'paid')
-                                <p class="inline float-right w-16 text-center bg-green-600 p-2 rounded-xl text-white text-sm">Paid</p>
+                            @elseif(($appointment->status == 'booked' || $appointment->status == 'completed') && $appointment->payment->status == 'paid')
+                                <p class="inline float-right w-16 text-center bg-green-600 px-2 py-1 rounded-xl font-semibold text-white text-xs">Paid</p>
                             @endif
-                            <span class="px-2 py-1 text-xs font-semibold inline-block rounded-full 
+                            <span class="mx-4 px-2 py-1 text-xs font-semibold inline-block rounded-full 
                                {{ $appointment->status == 'completed' ? 'bg-green-100 text-green-600' : 
                                 ($appointment->status == 'pending' ? 'bg-yellow-100 text-yellow-600' : 
                                 ($appointment->status == 'cancelled' ? 'bg-red-100 text-red-600' : 
                                 ($appointment->status == 'booked' ? 'bg-blue-100 text-blue-600' :'bg-gray-100 text-gray-600'))) }}">
                                  {{ ucfirst($appointment->status) }}
-                                  </span>
-                            <p>Appointment ID: {{ $appointment->id }}</p>
+                            </span>
+                            {{-- <div>
+                                <p>Appointment ID: {{ $appointment->id }}</p>
                                 <p class="text-sm text-gray-600">
                                     Specialization: {{ $appointment->doctor->specialization }}
                                 </p>
@@ -99,6 +100,7 @@
                                 <p class="text-sm text-gray-600">
                                     Reason: {{ $appointment->description }}
                                 </p>
+                            </div>
                                 
                                 <div class="mt-4 flex space-x-4">
                                     
@@ -119,7 +121,43 @@
                                             Cancel
                                         </button>
                                     </form>
+                                </div> --}}
+
+                                <div class="p-4 mt-4 bg-white rounded-lg shadow-md space-y-4">
+                                    <p class="text-lg font-semibold">Appointment ID: {{ $appointment->id }}</p>
+                                    
+                                    <div class="space-y-2 text-sm text-gray-600">
+                                        <p><span class="font-medium">Specialization:</span> {{ $appointment->doctor->specialization }}</p>
+                                        <p><span class="font-medium">Service:</span> {{ $appointment->service->name }}</p>
+                                        <p><span class="font-medium">Date:</span> {{ \Carbon\Carbon::parse($appointment->date)->format('F j, Y') }}</p>
+                                        <p><span class="font-medium">Time:</span> {{ \Carbon\Carbon::parse($appointment->start_time)->format('h:i A') }} - {{ \Carbon\Carbon::parse($appointment->end_time)->format('h:i A') }}</p>
+                                        <p><span class="font-medium">Reason:</span> {{ $appointment->description }}</p>
+                                    </div>
+                                
+                                    <div class="mt-4 flex space-x-6 justify-start">
+                                        <!-- View Appointment -->
+                                        <a href="{{ route('appointment.show', $appointment->id) }}" class="text-blue-600 hover:text-blue-800 font-medium transition duration-300">
+                                            <i class="fas fa-eye mr-2"></i> View
+                                        </a>
+                                
+                                        <!-- Edit Appointment (visible to doctors and admins only) -->
+                                        @if(Auth::user()->role == 'doctor' || Auth::user()->role == 'admin')
+                                        <a href="{{ route('appointment.edit', $appointment->id) }}" class="text-yellow-600 hover:text-yellow-800 font-medium transition duration-300">
+                                            <i class="fas fa-edit mr-2"></i> Edit
+                                        </a>
+                                        @endif
+                                
+                                        <!-- Cancel Appointment -->
+                                        <form method="POST" action="{{ route('appointment.destroy', $appointment->id) }}" onsubmit="return confirm('Are you sure you want to cancel this appointment?');" class="inline-block">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="text-red-600 hover:text-red-800 font-medium transition duration-300">
+                                                <i class="fas fa-times-circle mr-2"></i> Cancel
+                                            </button>
+                                        </form>
+                                    </div>
                                 </div>
+                                
                             </div>
                         @endforeach
                     </div>

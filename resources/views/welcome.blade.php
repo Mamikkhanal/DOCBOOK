@@ -67,7 +67,7 @@
             </div>
         </div>
 
-        <footer class="bg-gray-100 text-gray-800 py-8">
+        <footer class="bg-gray-100 text-gray-800 pt-10">
             <div class="flex-col items-center justify-center max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <div class="grid grid-cols-1 md:grid-cols-3 gap-20 ml-36">
                 
@@ -101,8 +101,8 @@
               </div>
           
               <!-- Footer Bottom -->
-              <div class="bg-gradient-to-br from-stone-300 to-stone-400  text-white mt-8 border-t border-gray-300 pt-4 text-center">
-                <p class="text-sm text-white">&copy; 2024 DOCBOOK. All rights reserved.</p>
+              <div class="bg-gradient-to-br from-stone-300 to-stone-400  text-blue-800 mt-6 border-t border-gray-300 p-1 text-center">
+                <p class="text-sm text-blue-800">&copy; 2024 DOCBOOK. All rights reserved.</p>
               </div>
             </div>
           </footer>

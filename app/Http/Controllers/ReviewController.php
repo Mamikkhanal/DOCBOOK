@@ -20,7 +20,7 @@ class ReviewController extends Controller
         $reviews = collect();
         if (Auth::user()->role==("admin")) 
         {
-            $reviews = Review::all();
+            $reviews = Review::with("appointment")->get();
             $reviews = $reviews->sortByDesc("created_at");
         }
         elseif (Auth::user()->role=="doctor") 
@@ -31,7 +31,8 @@ class ReviewController extends Controller
         $reviews = collect();
 
             foreach ($appointments as $appointment) {
-                $appointmentReviews = Review::where("appointment_id", $appointment->id)->get();
+                $appointmentReviews = Review::with("appointment")
+                ->where("appointment_id", $appointment->id)->get();
                 $reviews = $reviews->merge($appointmentReviews); // Merge the reviews
             }
             $reviews = $reviews->sortByDesc("created_at");
@@ -43,7 +44,8 @@ class ReviewController extends Controller
         $reviews = collect();
 
             foreach ($appointments as $appointment) {
-                $appointmentReviews = Review::where("appointment_id", $appointment->id)->get();
+                $appointmentReviews = Review::with("appointment")
+                ->where("appointment_id", $appointment->id)->get();
                 $reviews = $reviews->merge($appointmentReviews); // Merge the reviews
             }
             $reviews = $reviews->sortByDesc("created_at");
@@ -103,8 +105,8 @@ class ReviewController extends Controller
      */
     public function update(Request $request, Review $review)
     {
-        $patient_id = Appointment::where('appointment_id', $review->appointment_id)->first()->patient_id;
-        $patient = Patient::where('id', $patient_id)->first();
+        $appointment = Appointment::where('id', $review->appointment_id)->first();
+        $patient = Patient::where('id', $appointment->patient_id)->first();
         if($patient->user_id == Auth::user()->id) {
             $review->review = $request->review;
             $review->save();
@@ -119,8 +121,16 @@ class ReviewController extends Controller
     {
         $patient_id = Appointment::where('appointment_id', $review->appointment_id)->first()->patient_id;
         $patient = Patient::where('id', $patient_id)->first();
+        $doctor_id = Appointment::where('appointment_id', $review->appointment_id)->first()->doctor_id;
+        $doctor = Doctor::where('id', $doctor_id)->first();
         if($patient->user_id == Auth::user()->id) {
         $review->delete();
+        }
+        elseif($doctor->user_id == Auth::user()->id) {
+            $review->delete();
+        }
+        elseif(Auth::user()->role == 'admin') {
+            $review->delete();
         }
         return redirect()->route("review.index");
     }

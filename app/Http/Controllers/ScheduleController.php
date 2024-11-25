@@ -43,9 +43,16 @@ class ScheduleController extends Controller
     {
         $schedule = new Schedule();
         $schedule->doctor_id = Doctor::where("user_id", Auth::user()->id)->first()->id;
+        if(Carbon::parse($request->date)->format('d-m-Y') < Carbon::now()->format('d-m-Y')) {
+            return redirect()->route("schedule.create")->withErrors('Date must be after current date.');
+        }
         $schedule->date = $request->date;
         if($request->start_time > $request->end_time || $request->start_time == $request->end_time){
             return redirect()->route("schedule.create")->withErrors('Start time must be before end time.');
+        }
+        elseif($request->start_time < Carbon::now()->format('H:i') || $request->end_time < Carbon::now()->format('H:i')) 
+        {
+            return redirect()->route("schedule.create")->withErrors('Time must be after current time.');
         }
         $schedule->start_time = $request->start_time;
         $schedule->end_time = $request->end_time;
@@ -88,8 +95,18 @@ class ScheduleController extends Controller
     {
         $schedule = Schedule::find($id);
         $doctor= Doctor::where('id',$schedule->doctor_id)->first();
-
         if($doctor->user_id == Auth::user()->id) {
+            if(Carbon::parse($request->date)->format('d-m-Y') < Carbon::now()->format('d-m-Y')) {
+                return redirect()->route("schedule.edit",$schedule->id)->withErrors('Date must be after current date.');
+            }
+            $schedule->date = $request->date;
+            if($request->start_time > $request->end_time || $request->start_time == $request->end_time){
+                return redirect()->route("schedule.edit",$schedule->id)->withErrors('Start time must be before end time.');
+            }
+            elseif($request->start_time < Carbon::now()->format('H:i') || $request->end_time < Carbon::now()->format('H:i')) 
+            {
+                return redirect()->route("schedule.edit",$schedule->id)->withErrors('Time must be after current time.');
+            }
         $schedule->date = $request->date;
         $schedule->start_time = $request->start_time;
         $schedule->end_time = $request->end_time;

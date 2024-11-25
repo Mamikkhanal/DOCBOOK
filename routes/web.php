@@ -27,6 +27,9 @@ Route::middleware('IsAdmin')->group(function () {
     Route::resource('/service', ServiceController::class);
     Route::get('/admins', [RegisteredUserController::class,'admins'])->name('admins');
     Route::delete('/admins/delete/{id}', [RegisteredUserController::class,'adminsDelete'])->name('adminsDelete');
+    Route::get('/doctors', [DoctorController::class,'index'])->name('doctors');
+    Route::get('/patients', [PatientController::class,'index'])->name('patients');
+    
 });
 
 Route::middleware('IsPatient')->group(function () {

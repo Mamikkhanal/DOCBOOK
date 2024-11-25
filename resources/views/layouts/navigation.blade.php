@@ -29,13 +29,13 @@
                         <x-nav-link :href="route('admins')" :active="request()->routeIs('admins')">
                             Admins
                         </x-nav-link>
-                        {{-- <x-nav-link :href="route('doctors')" :active="request()->routeIs('doctors')">
+                        <x-nav-link :href="route('doctors')" :active="request()->routeIs('doctors')">
                             Doctors
                         </x-nav-link>
                         <x-nav-link :href="route('patients')" :active="request()->routeIs('patients')">
                             Patients
                         </x-nav-link>
-                        --}}
+                       
                         @elseif(Auth::user()->role == 'patient')
                             <x-nav-link :href="route('review.index')" :active="request()->routeIs('review.index')">
                                 Reviews

@@ -1,12 +1,12 @@
 <x-app-layout>
     <form method="POST" action="{{ route('register') }}" class="max-w-4xl mx-auto p-6">
         @csrf
-        <div class="text-center mb-2">
-            <h2 class="bg-gradient-to-br from-stone-300 to-stone-400 text-blue-800 rounded-lg p-4 text-2xl font-bold">Add Admin</h2>
+        <div class="text-center mb-1">
+            <h2 class="bg-gradient-to-br from-stone-300 to-stone-400 text-blue-800 rounded-lg p-2 text-2xl font-bold">Add Admin</h2>
             <p class="text-gray-500">Fill in the details below to add a new admin.</p>
         </div>
 
-        <div class="space-y-2">
+        <div class="space-y-1">
             <!-- Name Input -->
             <div>
                 <label for="name" class="block text-sm font-medium text-gray-700">Name</label>
@@ -69,8 +69,8 @@
         </div>
     </form>
 
-    <div class="max-w-4xl mx-auto p-6">
-        <h1 class="bg-gradient-to-br from-stone-300 to-stone-400 p-4 text-blue-800 rounded-lg text-2xl font-bold mb-6 text-center">Admins</h1> 
+    <div class="max-w-4xl mx-auto p-3">
+        <h1 class="bg-gradient-to-br from-stone-300 to-stone-400 p-2 text-blue-800 rounded-lg text-2xl font-bold mb-1 text-center">Admins</h1> 
         
         <!-- Admins List -->
         <table class="min-w-full border-collapse border border-gray-300 rounded-lg shadow-md">
@@ -84,7 +84,7 @@
             </thead>
             <tbody>
                 @forelse ($admins as $admin)
-                    <tr class="hover:bg-stone-50">
+                    <tr class="hover:bg-stone-50 text-blue-800">
                         <td class="border border-gray-300 px-4 py-2">{{ $admin->name }}</td>
                         <td class="border border-gray-300 px-4 py-2">{{ $admin->email }}</td>
                         <td class="border border-gray-300 px-4 py-2">{{ $admin->phone }}</td>

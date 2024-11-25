@@ -37,4 +37,8 @@ class Appointment extends Model
     public function payment(){
         return $this->hasOne(Payment::class);
     }
+    
+    public function review(){
+        return $this->hasOne(Review::class);
+    }
 }

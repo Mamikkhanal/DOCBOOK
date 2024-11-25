@@ -30,6 +30,11 @@
             @endif
 
             <!-- Submit Button -->
+            @if($errors->any())
+                @foreach($errors as $error)
+                <p class="text-sm text-red-500 mt-2">{{$error}}</p>
+                @endforeach
+            @endif
             <div class="text-center">
                 <button type="submit" class="bg-blue-700 text-white px-4 py-2 rounded-lg hover:bg-blue-800 focus:outline-none focus:ring focus:ring-indigo-500">
                     Create Schedule
