@@ -32,6 +32,7 @@
                                     <table class="min-w-full bg-white border border-gray-300 rounded-lg shadow-md">
                                         <thead>
                                             <tr class="bg-gradient-to-br from-stone-300 to-stone-400 text-left text-md font-medium text-blue-800">
+                                                <th class="py-4 px-4">Patient</th>
                                                 <th class="py-4 px-4">Doctor</th>
                                                 <th class="py-4 px-4">Service</th>
                                                 <th class="py-4 px-4">Date</th>
@@ -44,6 +45,7 @@
                                         <tbody>
                                             {{-- @foreach($appointments as $appointment) --}}
                                                 <tr class="hover:bg-gray-50">
+                                                    <td class="py-3 px-4 text-sm text-gray-700">{{ $appointment->patient->user->name }}</td>
                                                     <td class="py-3 px-4 text-sm text-gray-700">{{ $appointment->doctor->user->name }}</td>
                                                     <td class="py-3 px-4 text-sm text-gray-700">{{ $appointment->service->name }}</td>
                                                     <td class="py-3 px-4 text-sm text-gray-700">{{ \Carbon\Carbon::parse($appointment->date)->format('F j, Y') }}</td>

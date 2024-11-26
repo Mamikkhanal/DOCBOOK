@@ -41,12 +41,29 @@ class ScheduleController extends Controller
      */
     public function store(Request $request)
     {
+        $request->validate([
+            'date' => 'required|after_or_equal:today',
+            'start_time' => 'required',
+            'end_time' => 'required|after:start_time',
+        ]);
+
         $schedule = new Schedule();
+        $doctor_id =Doctor::where("user_id", Auth::user()->id)->first()->id;
         $schedule->doctor_id = Doctor::where("user_id", Auth::user()->id)->first()->id;
         if(Carbon::parse($request->date)->format('d-m-Y') < Carbon::now()->format('d-m-Y')) {
             return redirect()->route("schedule.create")->withErrors('Date must be after current date.');
         }
-        $schedule->date = $request->date;
+        $schedule->date = Carbon::parse($request->date)->format('d-m-Y');
+        $oldSchedules = Schedule::where('doctor_id', $doctor_id);
+
+        foreach ($oldSchedules as $oldSchedule) {
+            if ($oldSchedule->date == Carbon::parse($request->date)->format('d-m-Y')) {
+                if(Carbon::parse($request->start_time)->between($oldSchedule->start_time, $oldSchedule->end_time) || Carbon::parse($request->end_time)->between($oldSchedule->start_time, $oldSchedule->end_time)) {
+                    return redirect()->route("schedule.create")->withErrors('Schedule already exists.');
+                }
+            }
+        }
+
         if($request->start_time > $request->end_time || $request->start_time == $request->end_time){
             return redirect()->route("schedule.create")->withErrors('Start time must be before end time.');
         }
@@ -54,6 +71,7 @@ class ScheduleController extends Controller
         {
             return redirect()->route("schedule.create")->withErrors('Time must be after current time.');
         }
+        
         $schedule->start_time = $request->start_time;
         $schedule->end_time = $request->end_time;
         $schedule->save();
@@ -106,6 +124,15 @@ class ScheduleController extends Controller
             elseif($request->start_time < Carbon::now()->format('H:i') || $request->end_time < Carbon::now()->format('H:i')) 
             {
                 return redirect()->route("schedule.edit",$schedule->id)->withErrors('Time must be after current time.');
+            }
+
+            $oldSchedules = Schedule::where('doctor_id', $doctor->id);
+            foreach ($oldSchedules as $oldSchedule) {
+                if ($oldSchedule->date == $request->date) {
+                    if(Carbon::parse($request->start_time)->between($oldSchedule->start_time, $oldSchedule->end_time) || Carbon::parse($request->end_time)->between($oldSchedule->start_time, $oldSchedule->end_time)) {
+                        return redirect()->route("schedule.create")->withErrors('Schedule already exists.');
+                    }
+                }
             }
         $schedule->date = $request->date;
         $schedule->start_time = $request->start_time;

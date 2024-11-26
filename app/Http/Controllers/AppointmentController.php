@@ -118,7 +118,8 @@ class AppointmentController extends Controller
         }
         else{
             $appointmentDate = Carbon::parse($appointment->date);
-            if($appointmentDate<Carbon::now()){
+            $currentDate = Carbon::now()->startOfDay();
+            if($appointmentDate<$currentDate){
                 return redirect()->route('appointment.create')->withErrors('Date must be after current date');
             }
             foreach ($schedules as $schedule) {
@@ -193,9 +194,9 @@ class AppointmentController extends Controller
                     }
     
                 }
-                elseif (!$appointmentDate->eq($scheduleDate)) {
-                    return redirect()->route('appointment.create')->withErrors('Appointment date does not match schedule date.');
-                }
+                // elseif (!$appointmentDate->eq($scheduleDate)) {
+                //     return redirect()->route('appointment.create')->withErrors('Appointment date does not match schedule date.');
+                // }
             }
     
             return redirect()->route('appointment.create')->withErrors('Unknown error occurred. without any conditions checked');
@@ -205,8 +206,9 @@ class AppointmentController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Appointment $appointment)
+    public function show(Appointment $appointment, $id)
     {
+        $appointment = Appointment::with(['doctor.user', 'patient.user', 'service', 'payment'])->find($id);
         return view('appointment.show', compact('appointment'));
     }
 
