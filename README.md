@@ -18,7 +18,7 @@ Appointment Booking: Patients can view available time slots for doctors and book
 Schedule Management: Doctors can manage their availability by creating and updating appointment slots.<br/>
 Reviews: Patients can leave reviews on service provided after an appointment is completed.<br/>
 Payment System: Patients can make payments for their appointments using e-wallet.<br/>
-Appointment Status: Patients can view the status of their appointments.<br/>
+Appointment Status: Patients can view the status of their appointments and get notified through mail.<br/>
 Admin Role: Admins can manage users, services, appointments, and reviews.<br/>
 
 <h1> 2. Database Schema </h1>
