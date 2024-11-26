@@ -71,7 +71,7 @@
                             <form action="{{ route('review.create') }}" method="POST" class="inline float-right">
                                 @csrf
                                 <input type="hidden" name="appointment_id" value="{{ $appointment->id }}">
-                                <button type="submit" class="bg-yellow-200 p-1 rounded-xl text-red-600 text-sm">
+                                <button type="submit" class="bg-yellow-200 p-1 rounded-xl mx-2 text-red-600 text-xs font-semibold">
                                     Give a review
                                 </button>
                                     @if ($errors->any())

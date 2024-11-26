@@ -7,13 +7,15 @@ use App\Models\Slot;
 use App\Models\Doctor;
 use App\Models\Patient;
 use App\Models\Payment;
+
 use App\Models\Service;
-
 use App\Models\Schedule;
-use App\Models\Appointment;
 
+use App\Models\Appointment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\AppointmentCancelled;
 
 class AppointmentController extends Controller
 {
@@ -245,6 +247,12 @@ class AppointmentController extends Controller
         }
         if($appointment->status == 'booked') {
             return redirect()->route('payment.create',['appointment' => $appointment->id]);
+        }
+        elseif ($appointment->status == 'cancelled') {
+
+            Mail::to($appointment->patient->user->email)->send(new AppointmentCancelled($appointment));
+        
+            return redirect()->route('dashboard')->with('message', 'The patient has been notified about the cancellation.');
         }
 
         return redirect()->route('dashboard');
