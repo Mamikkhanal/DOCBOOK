@@ -22,7 +22,8 @@ class AppointmentEditRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'status'=>'required',
+            'description'=>'nullable|string',
         ];
     }
 }

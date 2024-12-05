@@ -18,12 +18,19 @@ class SpecializationController extends Controller
         $this->specializationService = $specializationService;
     }
 
+    /**
+     * Get all specializations.
+     */
+
     public function index()
     {
         $specializations = $this->specializationService->getAllSpecializations();
         return response()->json(['specializations' => $specializations], 200);
     }
 
+    /**
+     * Create a new specialization.
+     */
     public function store(SpecializationCreateRequest $request)
     {
         $data = $request->validated();
@@ -32,11 +39,18 @@ class SpecializationController extends Controller
         return response()->json(['message' => 'Specialization created successfully'], 201);
     }
 
+
+    /**
+     * Display a specified specialization.
+     */
     public function show(Specialization $specialization)
     {
         return response()->json(['specialization' => $specialization], 200);
     }
 
+    /**
+     * Update a specified specialization.
+     */
     public function update(SpecializationEditRequest $request, Specialization $specialization)
     {
         $data = $request->validated();
@@ -45,6 +59,9 @@ class SpecializationController extends Controller
         return response()->json(['message' => 'Specialization updated successfully'], 200);
     }
 
+    /**
+     * Delete a specified specialization.
+     */
     public function destroy(Specialization $specialization)
     {
         $this->specializationService->deleteSpecialization($specialization);

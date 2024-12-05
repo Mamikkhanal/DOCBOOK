@@ -67,7 +67,7 @@ Route::prefix('v1')->group(function () {
                 Route::post('/schedules', [ScheduleController::class, 'store']);
                 Route::get('/schedules/{schedule}', [ScheduleController::class, 'show']);
                 Route::put('/schedules/{schedule}', [ScheduleController::class, 'update']);
-                Route::put('/schedules/{schedule}', [ScheduleController::class, 'destroy']);
+                Route::delete('/schedules/{schedule}', [ScheduleController::class, 'destroy']);
 
             });
             

@@ -20,12 +20,18 @@ class ScheduleController extends Controller
         $this->scheduleService = $scheduleService;
     }
 
+    /**
+     * Get all scheudles.
+     */
     public function index()
     {
         $schedules = $this->scheduleService->getSchedulesForDoctor();
         return response()->json(['schedules' => $schedules], 200);
     }
 
+    /**
+     * Create a new schedule.
+     */
     public function store(ScheduleCreateRequest $request)
     {
         $data = $request->validated();
@@ -37,11 +43,17 @@ class ScheduleController extends Controller
         }
     }
 
+    /**
+     * Display a specified schedule.
+     */
     public function show(Schedule $schedule)
     {
         return response()->json(['schedule' => $schedule], 200);
     }
 
+    /**
+     * Update a specified scheudule.
+     */
     public function update(ScheduleEditRequest $request, $id)
     {
         $data = $request->validated();
@@ -56,6 +68,9 @@ class ScheduleController extends Controller
         }
     }
 
+    /**
+     * Delete a specified schedule.
+     */
     public function destroy($id)
     {
         $schedule = $this->scheduleService->findById($id);

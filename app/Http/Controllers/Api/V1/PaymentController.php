@@ -23,7 +23,7 @@ class PaymentController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Store a newly created payment.
      */
     public function store(Request $request)
     {
@@ -68,6 +68,9 @@ class PaymentController extends Controller
         //
     }
 
+    /**
+     * Pay for an appointment
+     */
     public function pay(Request $request, string $id)
     {
         $payment = Payment::findOrFail($id);
@@ -90,6 +93,9 @@ class PaymentController extends Controller
         return $esewa->init();
     }
 
+    /**
+     * Payment success
+     */
     public function success(Request $request)
     {
         $esewa = new Esewa();
@@ -120,6 +126,9 @@ class PaymentController extends Controller
     }
 
 
+    /**
+     * Payment failure
+     */
     public function failure(Request $request)
     {
         return response()->json(['success' => false, 'message' => 'Payment failed.'],400);

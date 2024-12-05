@@ -9,7 +9,7 @@ use App\Http\Controllers\Controller;
 class SlotController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Display all slots
      */
     public function index()
     {

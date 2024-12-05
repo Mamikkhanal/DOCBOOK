@@ -18,6 +18,10 @@ class ServiceController extends Controller
         $this->serviceService = $serviceService;
     }
 
+
+    /**
+     * Get all services.
+     */
     public function index()
     {
         $services = $this->serviceService->getAllServices();
@@ -26,6 +30,9 @@ class ServiceController extends Controller
         ], 200);
     }
 
+    /**
+     * Create a new service.
+     */
     public function store(ServiceCreateRequest $request)
     {
         $data = $request->validated();
@@ -36,6 +43,9 @@ class ServiceController extends Controller
         ], 201);
     }
 
+    /**
+     * Display a specified service.
+     */
     public function show(Service $service)
     {
         return response()->json([
@@ -43,6 +53,9 @@ class ServiceController extends Controller
         ], 200);
     }
 
+    /**
+     * Update a specified service.
+     */
     public function update(ServiceEditRequest $request, Service $service)
     {
         $data = $request->validated();
@@ -53,6 +66,9 @@ class ServiceController extends Controller
         ], 200);
     }
 
+    /**
+     * Delete a specified service.
+     */
     public function destroy(Service $service)
     {
         $this->serviceService->deleteService($service);

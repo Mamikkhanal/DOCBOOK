@@ -17,6 +17,9 @@ class ReviewController extends Controller
         $this->reviewService = $reviewService;
     }
 
+    /**
+     * Get all reviews associated.
+     */
     public function index()
     {
         try {
@@ -27,6 +30,10 @@ class ReviewController extends Controller
         }
     }
 
+
+    /**
+     * Create a new review.
+     */
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -42,6 +49,9 @@ class ReviewController extends Controller
         }
     }
 
+    /**
+     * Display a specified review.
+     */
     public function show(Review $review)
     {
         if (Gate::denies('show', $review)) {
@@ -50,6 +60,9 @@ class ReviewController extends Controller
         return response()->json(['data' => $review], 200);
     }
 
+    /**
+     * Update a specified review.
+     */
     public function update(Request $request, Review $review)
     {
         $validated = $request->validate([
@@ -64,6 +77,9 @@ class ReviewController extends Controller
         }
     }
 
+    /**
+     * Delete a specified review.
+     */
     public function destroy(Review $review)
     {
         try {

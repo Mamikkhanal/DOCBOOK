@@ -20,6 +20,9 @@ class AuthController extends Controller
         $this->authService = $authService;
     }
 
+    /**
+     * User Registration.
+     */
     public function register(UserRegisterRequest $request)
     {
         $result = $this->registerService->registerUser($request->all());
@@ -37,6 +40,9 @@ class AuthController extends Controller
         ], 500);
     }
 
+    /**
+     * User Login.
+     */
     public function login(LoginRequest $request)
     {
         $result = $this->authService->login($request->only('email', 'password'));
@@ -53,6 +59,9 @@ class AuthController extends Controller
         ],401);
     }
 
+    /**
+     * User Logout.
+     */
     public function logout(Request $request)
     {
         $result = $this->authService->logout($request->user());

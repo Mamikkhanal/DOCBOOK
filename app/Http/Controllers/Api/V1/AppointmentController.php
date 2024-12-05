@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\AppointmentCreateRequest;
+use App\Http\Requests\AppointmentEditRequest;
 use Illuminate\Http\Request;
 use App\Services\AppointmentService;
 use Auth;
@@ -19,7 +20,7 @@ class AppointmentController extends Controller
 
     
     /**
-     * Display a listing of the resource.
+     * Display all appointments according to roles
      */
     public function index()
     {
@@ -29,7 +30,7 @@ class AppointmentController extends Controller
     }
     
     /**
-     * Store a newly created resource in storage.
+     * Store a newly created appointment.
      */
     
     public function store(AppointmentCreateRequest $request)
@@ -42,7 +43,7 @@ class AppointmentController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * Display the specified appointment.
      */
     public function show(string $id)
     {
@@ -52,9 +53,9 @@ class AppointmentController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * Update the specified appointment.
      */
-    public function update(Request $request, string $id)
+    public function update(AppointmentEditRequest $request, string $id)
     {
         $result = $this->appointmentService->updateAppointment($request, $id);
 
@@ -62,7 +63,7 @@ class AppointmentController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Delete the specified appointment.
      */
     public function destroy(string $id)
     {
