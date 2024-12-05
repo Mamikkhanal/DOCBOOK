@@ -27,8 +27,8 @@ class UserRegisterRequest extends FormRequest
             'password' => 'required|min:8|confirmed',
             'role'=>['required', 'in:patient,doctor'],
             'phone' => ['required', 'string', 'min:10'],
-            'age' => ['integer', 'min:1'],
-            'specialization' => ['string'],
+            // 'age' => ['integer', 'min:1'],
+            // 'specialization' => ['string'],
 
         ];
     }
