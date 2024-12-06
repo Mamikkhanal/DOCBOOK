@@ -48,52 +48,79 @@ class AppointmentService
                 $q->whereHas('doctor.user', function ($subQuery) use ($search) {
                     $subQuery->where('name', 'LIKE', "%{$search}%");
                 })
-                ->orWhereHas('patient.user', function ($subQuery) use ($search) {
-                    $subQuery->where('name', 'LIKE', "%{$search}%");
-                })
-                ->orWhereHas('service', function ($subQuery) use ($search) {
-                    $subQuery->where('name', 'LIKE', "%{$search}%");
-                });
+                    ->orWhereHas('patient.user', function ($subQuery) use ($search) {
+                        $subQuery->where('name', 'LIKE', "%{$search}%");
+                    })
+                    ->orWhereHas('service', function ($subQuery) use ($search) {
+                        $subQuery->where('name', 'LIKE', "%{$search}%");
+                    });
             });
         }
         $appointments = $query->orderBy('id', 'desc')->get();
 
         return response()->json($appointments);
     }
-    
+
     public function getAllAppointments()
     {
-        if (Auth::user()->role == 'admin') {
-            $apppointments = Appointment::with('patient', 'doctor', 'service')->get();
+        if (Auth::user()->role == 'admin') 
+        {
+            $appointments = Appointment::with('patient', 'doctor', 'service')->get();
+
+            if ($appointments->isEmpty()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No appointments found'
+                ], 404);
+            }
+
             return response()->json([
-                'success' => true, 
-                'data' => $apppointments
-            ],200);
-        }
-        elseif(Auth::user()->role == 'doctor')
+                'success' => true,
+                'data' => $appointments
+            ], 200);
+        } 
+        elseif (Auth::user()->role == 'doctor') 
         {
             $doctor = Doctor::where('user_id', Auth::user()->id)->first();
-            $apppointments = Appointment::where('doctor_id', $doctor->id)->with('patient', 'doctor', 'service')->get();
+
+            $appointments = Appointment::where('doctor_id', $doctor->id)->with('patient', 'doctor', 'service')->get();
+            
+            if ($appointments->isEmpty()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No appointments found'
+                ], 404);
+            }
+
             return response()->json([
-                'success' => true, 
-                'data' => $apppointments
-            ],200);
-        }
-        elseif(Auth::user()->role == 'patient')
+                'success' => true,
+                'data' => $appointments
+            ], 200);
+        } 
+        elseif (Auth::user()->role == 'patient') 
         {
             $patient = Patient::where('user_id', Auth::user()->id)->first();
-            $apppointments = Appointment::where('patient_id', $patient->id)->with('patient', 'doctor', 'service')->get();
+
+            $appointments = Appointment::where('patient_id', $patient->id)->with('patient', 'doctor', 'service')->get();
+            
+            if ($appointments->isEmpty()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No appointments found'
+                ], 404);
+            }
+
             return response()->json([
-                'success' => true, 
-                'data' => $apppointments
-            ],200);
-        }
-        else
+                'success' => true,
+                'data' => $appointments
+            ], 200);
+        } 
+        else 
         {
             return response()->json([
-                'success' => false, 
-                'message' => 'No appointments found'
-            ],404);
+                'success' => false,
+                'message' => 'You are not authenticated'
+            ], 404);
         }
     }
 
@@ -273,7 +300,7 @@ class AppointmentService
             return response()->json([
                 'success' => false,
                 'message' => 'No schedule found for the doctor.',
-            ],404);
+            ], 404);
         } else {
             $appointmentDate = Carbon::parse($appointment->date);
             $currentDate = Carbon::now()->startOfDay();
@@ -281,7 +308,7 @@ class AppointmentService
                 return response()->json([
                     'success' => false,
                     'message' => 'The appointment date must be today or a future date.',
-                ],422);
+                ], 422);
             }
             foreach ($schedules as $schedule) {
 
@@ -300,13 +327,13 @@ class AppointmentService
                         return response()->json([
                             'success' => false,
                             'message' => 'Appointment time must be after the current time.',
-                        ],422);
+                        ], 422);
                     }
                     if ($appointmentStartTime > $appointmentEndTime) {
                         return response()->json([
                             'success' => false,
                             'message' => 'The start time must be before the end time.',
-                        ],422);
+                        ], 422);
                     }
 
                     if (
@@ -316,7 +343,7 @@ class AppointmentService
                         return response()->json([
                             'success' => false,
                             'message' => 'Appointment time is out of the schedule bounds.',
-                        ],422);
+                        ], 422);
                     }
                     $slots = Slot::where('schedule_id', $schedule->id)->get();
                     if ($slots->isEmpty()) {
@@ -332,7 +359,7 @@ class AppointmentService
                         return response()->json([
                             'success' => true,
                             'message' => 'Appointment created successfully.',
-                        ],200);
+                        ], 200);
                     }
 
                     // foreach ($slots as $slot) {
@@ -375,7 +402,7 @@ class AppointmentService
                     // }
 
 
-                    $isSlotAvailable = true; 
+                    $isSlotAvailable = true;
 
                     foreach ($slots as $slot) {
                         $slotStartTime = Carbon::parse($slot->start_time);
@@ -401,7 +428,7 @@ class AppointmentService
                             'data' => [
                                 'slots' => $slots,
                             ],
-                        ],422);
+                        ], 422);
                     }
 
                     $appointment->save();
@@ -417,13 +444,13 @@ class AppointmentService
                     return response()->json([
                         'success' => true,
                         'message' => 'Appointment created successfully.',
-                    ],200);
+                    ], 200);
                 }
             }
             return response()->json([
                 'success' => false,
                 'message' => 'No such schedule found.',
-            ],404);
+            ], 404);
         }
     }
 
@@ -437,15 +464,13 @@ class AppointmentService
             return response()->json([
                 'success' => true,
                 'data' => $appointment,
-            ],200);
-        }
-        else {
+            ], 200);
+        } else {
             return response()->json([
                 'success' => false,
                 'message' => 'You are not authorized to view this appointment.',
-            ],403);
+            ], 403);
         }
-
     }
 
 
@@ -453,21 +478,18 @@ class AppointmentService
     {
         $appointment = Appointment::findOrFail($id);
         $doctor = Doctor::where('id', $appointment->doctor_id)->first();
-        if ($doctor->user_id ==Auth::user()->id || Auth::user()->role == 'admin') {
+        if ($doctor->user_id == Auth::user()->id || Auth::user()->role == 'admin') {
 
-            if($appointment->status == 'booked' && $request->status == 'pending')
-            {
+            if ($appointment->status == 'booked' && $request->status == 'pending') {
                 return response()->json([
                     'success' => false,
                     'message' => 'You cannot make an already booked appointment pending.',
-                ],422);
-            }
-            elseif($appointment->status == 'completed' && $request->status == 'booked'|| $request->status == 'pending'|| $request->status == 'cancelled')
-            {
+                ], 422);
+            } elseif ($appointment->status == 'completed' && $request->status == 'booked' || $request->status == 'pending' || $request->status == 'cancelled') {
                 return response()->json([
                     'success' => false,
                     'message' => 'You cannot make status update on a completed appointment.',
-                ],422);
+                ], 422);
             }
 
             $appointment->status = $request->status;
@@ -478,24 +500,20 @@ class AppointmentService
 
                 $result = $this->paymentService->createPayment($appointment->id);
                 Mail::to($appointment->patient->user->email)->send(new AppointmentBooked($appointment));
-            }
-            elseif ($appointment->status == 'cancelled') {
-                
+            } elseif ($appointment->status == 'cancelled') {
+
                 Mail::to($appointment->patient->user->email)->send(new AppointmentCancelled($appointment));
             }
             return response()->json([
                 'success' => true,
                 'message' => 'Appointment updated successfully.',
-            ],200);
-        }
-        else
-        {
+            ], 200);
+        } else {
             return response()->json([
                 'success' => false,
                 'message' => 'You are not authorized to update this appointment.',
-            ],403);
+            ], 403);
         }
-
     }
 
     public function deleteAppointment($id)
@@ -504,12 +522,12 @@ class AppointmentService
         $doctor = Doctor::where('doctor_id', $appointment->doctor_id)->first();
 
         if ($doctor->user_id == Auth::user()->id || Auth::user()->role == 'admin') {
-            
+
             $appointment->delete();
             return response()->json([
                 'success' => true,
                 'message' => 'Appointment deleted successfully.',
-            ],200);
+            ], 200);
         }
     }
 }
