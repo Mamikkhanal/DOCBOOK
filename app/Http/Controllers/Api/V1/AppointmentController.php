@@ -18,6 +18,15 @@ class AppointmentController extends Controller
         $this->appointmentService = $appointmentService;
     }
 
+    /**
+     * Search for appointments
+     */
+    public function search(Request $request)
+    {
+        $request->validate(['search' => 'required|string']);
+        $result = $this->appointmentService->searchAppointments($request);
+        return response()->json($result);
+    }
     
     /**
      * Display all appointments according to roles

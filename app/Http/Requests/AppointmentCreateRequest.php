@@ -21,7 +21,7 @@ class AppointmentCreateRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
+        $rules= [
             
             'doctor_id' => 'required|exists:doctors,id',
 
@@ -53,5 +53,13 @@ class AppointmentCreateRequest extends FormRequest
             ],
             'description' => 'required',
         ];
+        
+        if ($this->input('role') === 'patient') {
+            $rules['age'] = ['required', 'integer', 'min:1'];
+        } elseif ($this->input('role') === 'doctor') {
+            $rules['specialization'] = ['required', 'string'];
+        }
+
+        return $rules;
     }
 }

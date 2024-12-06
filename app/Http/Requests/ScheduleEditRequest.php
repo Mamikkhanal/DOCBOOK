@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use Carbon\Carbon;
 use Illuminate\Foundation\Http\FormRequest;
 
 class ScheduleEditRequest extends FormRequest
@@ -30,19 +31,29 @@ class ScheduleEditRequest extends FormRequest
             'start_time' => [
                 'required',
                 function ($attribute, $value, $fail) {
-                    $date = $this->input('date');
-                    if ($date === today()->toDateString() && $value < now()->format('H:i:s')) {
+                    $date = Carbon::parse($this->input('date'));
+                    $startTime = Carbon::parse($value);
+                    $now = Carbon::now();
+
+                    if ($date->isToday() && $startTime->lessThanOrEqualTo($now)) {
                         $fail('The start time must be after the current time for today.');
                     }
                 },
             ],
             'end_time' => [
                 'required',
-                'after:start_time',
                 function ($attribute, $value, $fail) {
-                    $date = $this->input('date');
-                    if ($date === today()->toDateString() && $value < now()->format('H:i:s')) {
+                    $date = Carbon::parse($this->input('date'));
+                    $endTime = Carbon::parse($value);
+                    $startTime = Carbon::parse($this->input('start_time'));
+                    $now = Carbon::now();
+
+                    if ($date->isToday() && $endTime->lessThanOrEqualTo($now)) {
                         $fail('The end time must be after the current time for today.');
+                    }
+
+                    if ($endTime->lessThanOrEqualTo($startTime)) {
+                        $fail('The end time must be after the start time.');
                     }
                 },
             ],

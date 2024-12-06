@@ -29,6 +29,38 @@ class AppointmentService
         $this->paymentService = $paymentService;
     }
 
+
+    public function searchAppointments($request)
+    {
+        $query = Appointment::with(['doctor.user', 'patient.user', 'service', 'payment']);
+
+        if (Auth::user()->role == 'patient') {
+            $patient_id = Patient::where('user_id', Auth::id())->first()->id;
+            $query->where('patient_id', $patient_id);
+        } elseif (Auth::user()->role == 'doctor') {
+            $doctor_id = Doctor::where('user_id', Auth::id())->first()->id;
+            $query->where('doctor_id', $doctor_id);
+        }
+
+        if ($request->has('search') && $request->search != '') {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->whereHas('doctor.user', function ($subQuery) use ($search) {
+                    $subQuery->where('name', 'LIKE', "%{$search}%");
+                })
+                ->orWhereHas('patient.user', function ($subQuery) use ($search) {
+                    $subQuery->where('name', 'LIKE', "%{$search}%");
+                })
+                ->orWhereHas('service', function ($subQuery) use ($search) {
+                    $subQuery->where('name', 'LIKE', "%{$search}%");
+                });
+            });
+        }
+        $appointments = $query->orderBy('id', 'desc')->get();
+
+        return response()->json($appointments);
+    }
+    
     public function getAllAppointments()
     {
         if (Auth::user()->role == 'admin') {
@@ -422,6 +454,21 @@ class AppointmentService
         $appointment = Appointment::findOrFail($id);
         $doctor = Doctor::where('id', $appointment->doctor_id)->first();
         if ($doctor->user_id ==Auth::user()->id || Auth::user()->role == 'admin') {
+
+            if($appointment->status == 'booked' && $request->status == 'pending')
+            {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'You cannot make an already booked appointment pending.',
+                ],422);
+            }
+            elseif($appointment->status == 'completed' && $request->status == 'booked'|| $request->status == 'pending'|| $request->status == 'cancelled')
+            {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'You cannot make status update on a completed appointment.',
+                ],422);
+            }
 
             $appointment->status = $request->status;
             $appointment->description = $request->description;

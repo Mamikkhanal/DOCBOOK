@@ -17,6 +17,9 @@ class ScheduleRepository
 
     public function getDoctorSchedules($doctorId)
     {
+        if ($doctorId == null) {
+            return Schedule::all();
+        }
         return Schedule::where('doctor_id', $doctorId)->get();
     }
 

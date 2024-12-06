@@ -41,6 +41,7 @@ Route::prefix('v1')->group(function () {
             Route::get('/slots', [SlotController::class, 'index']);
 
             Route::get('/appointments', [AppointmentController::class, 'index']);
+            Route::get('/appointments/search', [AppointmentController::class, 'search']);
             Route::get('/appointments/{appointment}', [AppointmentController::class, 'show']);
 
             Route::get('/payments/{id}/pay', [PaymentController::class, 'pay'])->name('payment.pay');
