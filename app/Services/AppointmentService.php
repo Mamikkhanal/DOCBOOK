@@ -124,7 +124,6 @@ class AppointmentService
         }
     }
 
-    // public function createAppointment($request)
     // {
     //     // DB::beginTransaction();
 
@@ -340,6 +339,15 @@ class AppointmentService
                         !$appointmentStartTime->between($scheduleStartTime, $scheduleEndTime) ||
                         !$appointmentEndTime->between($scheduleStartTime, $scheduleEndTime)
                     ) {
+                        $count = 0;
+                        foreach ($schedules as $schedule) {
+                            if($scheduleDate->eq($schedule->date)) {
+                                $count = $count + 1;
+                            }
+                        }
+                        if ($count >1){
+                            continue;
+                        }
                         return response()->json([
                             'success' => false,
                             'message' => 'Appointment time is out of the schedule bounds.',
@@ -361,8 +369,6 @@ class AppointmentService
                             'message' => 'Appointment created successfully.',
                         ], 200);
                     }
-
-                    // foreach ($slots as $slot) {
                     //     $slotStartTime = Carbon::parse($slot->start_time);
                     //     $slotEndTime = Carbon::parse($slot->end_time);
 
