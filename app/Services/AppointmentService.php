@@ -463,8 +463,8 @@ class AppointmentService
     public function getAppointment($id)
     {
         $appointment = Appointment::findOrFail($id);
-        $doctor = Doctor::where('doctor_id', $appointment->doctor_id)->first();
-        $patient = Patient::where('patient_id', $appointment->patient_id)->first();
+        $doctor = Doctor::where('id', $appointment->doctor_id)->first();
+        $patient = Patient::where('id', $appointment->patient_id)->first();
 
         if ($doctor->user_id == Auth::user()->id || $patient->user_id == Auth::user()->id || Auth::user()->role == 'admin') {
             return response()->json([
@@ -525,15 +525,20 @@ class AppointmentService
     public function deleteAppointment($id)
     {
         $appointment = Appointment::findOrFail($id);
-        $doctor = Doctor::where('doctor_id', $appointment->doctor_id)->first();
+        $doctor = Doctor::where('id', $appointment->doctor_id)->first();
 
-        if ($doctor->user_id == Auth::user()->id || Auth::user()->role == 'admin') {
-
+        if (($doctor->user_id == Auth::user()->id || Auth::user()->role == 'admin') && ($appointment->status == 'pending' || $appointment->status == 'cancelled')) {
             $appointment->delete();
             return response()->json([
                 'success' => true,
                 'message' => 'Appointment deleted successfully.',
             ], 200);
+        }
+        else{
+            return response()->json ([
+                'success' => false,
+                'message' => 'You are not authorized to delete this appointment.',
+            ],403);
         }
     }
 }
