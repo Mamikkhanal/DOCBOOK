@@ -65,12 +65,7 @@ class AppointmentService
 
         $appointments = $query->orderBy('id', 'desc')->get();
 
-        return response()->json(
-            [
-                'status' => true,
-                'data' => $appointments
-            ]
-        );
+        return $appointments;
     }
 
     public function getAllAppointments()
@@ -79,18 +74,7 @@ class AppointmentService
 
             $appointments = Appointment::with('patient', 'doctor', 'service')->get();
 
-            if ($appointments->isEmpty()) {
-
-                return response()->json([
-                    'success' => false,
-                    'message' => 'No appointments found'
-                ], 404);
-            }
-
-            return response()->json([
-                'success' => true,
-                'data' => $appointments
-            ], 200);
+            return $appointments;
 
         } elseif (Auth::user()->role == 'doctor') {
 
@@ -98,18 +82,7 @@ class AppointmentService
 
             $appointments = Appointment::where('doctor_id', $doctor->id)->with('patient', 'doctor', 'service')->get();
 
-            if ($appointments->isEmpty()) {
-
-                return response()->json([
-                    'success' => false,
-                    'message' => 'No appointments found'
-                ], 404);
-            }
-
-            return response()->json([
-                'success' => true,
-                'data' => $appointments
-            ], 200);
+            return $appointments;
 
         } elseif (Auth::user()->role == 'patient') {
 
@@ -117,17 +90,7 @@ class AppointmentService
 
             $appointments = Appointment::where('patient_id', $patient->id)->with('patient', 'doctor', 'service')->get();
 
-            if ($appointments->isEmpty()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'No appointments found'
-                ], 404);
-            }
-
-            return response()->json([
-                'success' => true,
-                'data' => $appointments
-            ], 200);
+            return $appointments;
 
         } else {
 
@@ -286,10 +249,7 @@ class AppointmentService
                         'end_time' => $appointment->end_time,
                     ]);
 
-                    return response()->json([
-                        'success' => true,
-                        'message' => 'Appointment created successfully.',
-                    ], 200);
+                    return (true);
                 }
             }
             
@@ -310,10 +270,7 @@ class AppointmentService
 
         if ($doctor->user_id == Auth::user()->id || $patient->user_id == Auth::user()->id || Auth::user()->role == 'admin') {
 
-            return response()->json([
-                'success' => true,
-                'data' => $appointment,
-            ], 200);
+            return $appointment;
 
         } else {
 
@@ -363,10 +320,7 @@ class AppointmentService
                 Mail::to($appointment->patient->user->email)->send(new AppointmentCancelled($appointment));
             }
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Appointment updated successfully.',
-            ], 200);
+            return (true);
 
         } else {
 
@@ -387,10 +341,7 @@ class AppointmentService
            
             $appointment->delete();
             
-            return response()->json([
-                'success' => true,
-                'message' => 'Appointment deleted successfully.',
-            ], 200);
+            return (true);
 
         } else {
 

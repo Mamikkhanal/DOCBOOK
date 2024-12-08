@@ -26,7 +26,13 @@ class AppointmentController extends Controller
         $request->validate(['search' => 'required|string']);
         $result = $this->appointmentService->searchAppointments($request);
 
-        return $result;
+        return response()->json(
+            [
+                'success' => true,
+                'data' => $result,
+            ],
+            200
+        );
     }
 
     /**
@@ -36,7 +42,23 @@ class AppointmentController extends Controller
     {
         $result = $this->appointmentService->getAllAppointments();
 
-        return $result;
+        if (!$result) {
+            return response()->json(
+                [
+                    'success' => false,
+                    'message' => 'No appointments found.'
+                ],
+                404
+            );
+        }
+
+        return response()->json(
+            [
+                'success' => true,
+                'data' => $result
+            ],
+            200
+        );
     }
 
     /**
@@ -48,7 +70,23 @@ class AppointmentController extends Controller
 
         $result = $this->appointmentService->createAppointment($request);
 
-        return $result;
+        if (!$result) {
+            return response()->json(
+                [
+                    'success' => false,
+                    'message' => 'Appointment creation failed'
+                ],
+                500
+            );
+        }
+
+        return response()->json(
+            [
+                'success' => true,
+                'message' => 'Appointment created successfully',
+            ],
+            201
+        );
     }
 
     /**
@@ -58,7 +96,23 @@ class AppointmentController extends Controller
     {
         $result = $this->appointmentService->getAppointment($id);
 
-        return $result;
+        if (!$result) {
+            return response()->json(
+                [
+                    'success' => false,
+                    'message' => 'Appointment not found'
+                ],
+                404
+            );
+        }   
+
+        return response()->json(
+            [
+                'success' => true,
+                'data' => $result
+            ],
+            200     
+        );
     }
 
     /**
@@ -68,7 +122,23 @@ class AppointmentController extends Controller
     {
         $result = $this->appointmentService->updateAppointment($request, $id);
 
-        return $result;
+        if (!$result) {
+            return response()->json(
+                [
+                    'success' => false,
+                    'message' => 'Appointment update failed'
+                ],
+                500
+            );
+        }
+
+        return response()->json(
+            [
+                'success' => true,
+                'message' => 'Appointment updated successfully',
+            ],
+            200
+        );
     }
 
     /**
@@ -78,6 +148,22 @@ class AppointmentController extends Controller
     {
         $result = $this->appointmentService->deleteAppointment($id);
 
-        return $result;
+        if (!$result) {
+            return response()->json(
+                [
+                    'success' => false,
+                    'message' => 'Appointment deletion failed'
+                ],
+                500
+            );
+        }
+
+        return response()->json(
+            [
+                'success' => true,
+                'message' => 'Appointment deleted successfully',
+            ],
+            200 
+        );
     }
 }
