@@ -26,7 +26,17 @@ class ScheduleController extends Controller
     public function index()
     {
         $schedules = $this->scheduleService->getSchedulesForDoctor();
-        return response()->json(['schedules' => $schedules], 200);
+
+        if (!$schedules) {
+            return response()->json([
+                'status' => false,
+                'message' => 'No schedules found'
+            ], 404);
+        }
+        return response()->json([
+            'status' => true,
+            'schedules' => $schedules
+        ], 200);
     }
 
     /**
@@ -37,9 +47,23 @@ class ScheduleController extends Controller
         $data = $request->validated();
         try {
             $schedule = $this->scheduleService->createSchedule($data);
-            return response()->json(['message' => 'Schedule created successfully'], 201);
+
+            if (!$schedule) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Schedule creation failed'
+                ], 400);
+            }
+            return response()->json([
+                'status' => true,
+                'message' => 'Schedule created successfully'
+            ], 201);
         } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 400);
+
+            return response()->json([
+                'status' => false,
+                'error' => $e->getMessage()
+            ], 400);
         }
     }
 
@@ -49,7 +73,17 @@ class ScheduleController extends Controller
     public function show(Schedule $schedule)
     {
         $result = $this->scheduleService->getScheduleById($schedule);
-        return response()->json($result, 200);
+
+        if (!$result) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Schedule not found'
+            ], 404);
+        }
+        return response()->json([
+            'status' => true,
+            'data' => $result
+        ], 200);
     }
 
     /**
@@ -63,9 +97,24 @@ class ScheduleController extends Controller
 
         try {
             $result = $this->scheduleService->updateSchedule($schedule, $data);
-            return response()->json([$result], 200);
+
+            if (!$result) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Schedule update failed'
+                ], 400);
+            }
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Schedule updated successfully',
+            ], 200);
         } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 400);
+
+            return response()->json([
+                'status' => false,
+                'error' => $e->getMessage()
+            ], 400);
         }
     }
 
@@ -78,9 +127,27 @@ class ScheduleController extends Controller
 
         try {
             $result = $this->scheduleService->deleteSchedule($schedule);
-            return response()->json([$result], 200);
+
+            if (!$result) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Schedule deletion failed'
+                ], 400);
+            }
+            return response()->json(
+                [
+                    'status' => true,
+                    'message' => 'Schedule deleted successfully',
+                    'data' => [$result]
+                ],
+                200
+            );
         } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 400);
+
+            return response()->json([
+                'status' => false,
+                'error' => $e->getMessage()
+            ], 400);
         }
     }
 }

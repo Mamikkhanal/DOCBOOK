@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
 class IsDoctorOrAdmin
@@ -15,6 +16,19 @@ class IsDoctorOrAdmin
      */
     public function handle(Request $request, Closure $next): Response
     {
-        return $next($request);
+        $user = Auth::user();
+
+        if ($user && ($user->role == "admin" || $user->role == "doctor")) {
+    
+            return $next($request);
+        }
+
+        return response()->json(
+            [
+                'status' => false,
+                'message' => 'You are not authorized to access this route.'
+            ],
+            403
+        );
     }
 }

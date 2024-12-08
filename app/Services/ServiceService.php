@@ -23,13 +23,17 @@ class ServiceService
 
     public function createService($data)
     {
-        
-        return $this->serviceRepository->create($data);
+       return $this->serviceRepository->create($data);
+    }
+
+    public function getService($id)
+    {
+        return $this->serviceRepository->find($id);
     }
 
     public function updateService($service, $data)
     {
-        return $this->serviceRepository->update($service, $data);
+       return $this->serviceRepository->update($service, $data);
     }
 
     public function deleteService($service)

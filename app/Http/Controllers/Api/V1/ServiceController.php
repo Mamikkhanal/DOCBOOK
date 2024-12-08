@@ -15,7 +15,7 @@ class ServiceController extends Controller
 
     public function __construct(ServiceService $serviceService)
     {
-        $this->serviceService = $serviceService;
+       $result = $this->serviceService = $serviceService;
     }
 
 
@@ -24,10 +24,18 @@ class ServiceController extends Controller
      */
     public function index()
     {
-        $services = $this->serviceService->getAllServices();
-        return response()->json([
-            'services' => $services
-        ], 200);
+        $result = $this->serviceService->getAllServices();
+
+        if (!$result) {
+            return response()->json([
+                'status' => false,
+                'message' => 'No services found'
+            ], 404);
+        }
+        return response ()->json([
+            'status' => true,
+            'data'=> $result,
+        ],200);
     }
 
     /**
@@ -37,10 +45,18 @@ class ServiceController extends Controller
     {
         $data = $request->validated();
 
-        $service = $this->serviceService->createService($data);
-        return response()->json([
+        $result = $this->serviceService->createService($data);
+
+        if (!$result) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Service creation failed'
+            ], 500);
+        }
+        return response ()->json([
+            'status' => true,
             'message' => 'Service created successfully',
-        ], 201);
+        ],201);
     }
 
     /**
@@ -48,9 +64,19 @@ class ServiceController extends Controller
      */
     public function show(Service $service)
     {
-        return response()->json([
-            'service' => $service
-        ], 200);
+        $result = $this->serviceService->getService($service);
+
+        if (!$result) {
+            return response()->json([
+                'status' => false,
+                'message' => 'No service found'
+            ], 404);        
+        } else {
+            return response()->json([
+                'status' => true,
+                'data' => $result
+            ], 200);
+        }
     }
 
     /**
@@ -60,7 +86,14 @@ class ServiceController extends Controller
     {
         $data = $request->validated();
 
-        $this->serviceService->updateService($service, $data);
+        $result = $this->serviceService->updateService($service, $data);
+
+        if (!$result) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Service update failed'
+            ], 500);
+        }
         return response()->json([
             'message' => 'Service updated successfully'
         ], 200);
@@ -71,7 +104,14 @@ class ServiceController extends Controller
      */
     public function destroy(Service $service)
     {
-        $this->serviceService->deleteService($service);
+        $result =$this->serviceService->deleteService($service);
+
+        if (!$result) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Service deletion failed'
+            ], 500);
+        }
         return response()->json([
             'message' => 'Service deleted successfully'
         ], 200);

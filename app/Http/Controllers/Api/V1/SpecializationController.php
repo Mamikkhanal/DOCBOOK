@@ -25,7 +25,17 @@ class SpecializationController extends Controller
     public function index()
     {
         $specializations = $this->specializationService->getAllSpecializations();
-        return response()->json(['specializations' => $specializations], 200);
+
+        if (!$specializations) {
+            return response()->json([
+                'status' => false,
+                'message' => 'No specializations found'
+            ], 404);
+        }
+        return response()->json([
+            'status' => true,
+            'data' => $specializations
+        ], 200);
     }
 
     /**
@@ -34,9 +44,19 @@ class SpecializationController extends Controller
     public function store(SpecializationCreateRequest $request)
     {
         $data = $request->validated();
+        
         $specialization = $this->specializationService->createSpecialization($data);
 
-        return response()->json(['message' => 'Specialization created successfully'], 201);
+        if (!$specialization) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Specialization creation failed'
+            ], 500);
+        }
+        return response()->json([
+            'status' => true,
+            'message' => 'Specialization created successfully'
+        ], 201);
     }
 
 
@@ -45,7 +65,18 @@ class SpecializationController extends Controller
      */
     public function show(Specialization $specialization)
     {
-        return response()->json(['specialization' => $specialization], 200);
+        $specialization = $this->specializationService->getSpecialization($specialization);
+
+        if (!$specialization) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Specialization not found'
+            ], 404);
+        }
+        return response()->json([
+            'status' => true,
+            'specialization' => $specialization
+        ], 200);
     }
 
     /**
@@ -53,10 +84,18 @@ class SpecializationController extends Controller
      */
     public function update(SpecializationEditRequest $request, Specialization $specialization)
     {
-        $data = $request->validated();
-        $this->specializationService->updateSpecialization($specialization, $data);
+        $specialization = $this->specializationService->updateSpecialization($specialization, $request['data']);
 
-        return response()->json(['message' => 'Specialization updated successfully'], 200);
+        if (!$specialization) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Specialization update failed'
+            ], 500);
+        }
+        return response()->json([
+            'status' => true,
+            'message' => 'Specialization updated successfully'
+        ], 200);
     }
 
     /**
@@ -64,7 +103,17 @@ class SpecializationController extends Controller
      */
     public function destroy(Specialization $specialization)
     {
-        $this->specializationService->deleteSpecialization($specialization);
-        return response()->json(['message' => 'Specialization deleted successfully'], 200);
+        $specialization =  $this->specializationService->deleteSpecialization($specialization);
+
+        if (!$specialization) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Specialization deletion failed'
+            ], 500);
+        }
+        return response()->json([
+            'status' => true,
+            'message' => 'Specialization deleted successfully'
+        ], 200);
     }
 }

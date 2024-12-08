@@ -16,11 +16,16 @@ class ReviewRepository
     }
     public function getAllReviewsByRole($user, $role)
     {
-        if ($role === 'admin') {
+        if ($role === 'admin') 
+        {
             return Review::with('appointment')->orderByDesc('created_at')->get();
-        } elseif ($role === 'doctor') {
+        } 
+        elseif ($role === 'doctor') 
+        {
             $appointments = Appointment::where('doctor_id', $user->doctor->id)->get();
-        } elseif ($role === 'patient') {
+        } 
+        elseif ($role === 'patient') 
+        {
             $appointments = Appointment::where('patient_id', $user->patient->id)->get();
         }
 
@@ -29,6 +34,11 @@ class ReviewRepository
                 ->where('appointment_id', $appointment->id)
                 ->get();
         })->sortByDesc('created_at');
+    }
+
+    public function findById($id)
+    {
+        return Review::where('id', $id)->first();
     }
 
     public function findByAppointmentId($appointmentId)

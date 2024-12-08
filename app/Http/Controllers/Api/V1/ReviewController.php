@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use App\Services\ReviewService;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Gate;
+use App\Http\Requests\ReviewEditRequest;
+use App\Http\Requests\ReviewCreateRequest;
 
 class ReviewController extends Controller
 {
@@ -24,9 +26,22 @@ class ReviewController extends Controller
     {
         try {
             $reviews = $this->reviewService->getReviewsForCurrentUser();
-            return response()->json(['data' => $reviews], 200);
+            return response()->json(
+                [
+                    'status' => true,
+                    'message' => 'Reviews fetched successfully',
+                    'data' => $reviews
+                ],
+                200
+            );
         } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
+            return response()->json(
+                [
+                    'status' => false,
+                    'error' => $e->getMessage(),
+                ],
+                500
+            );
         }
     }
 
@@ -34,18 +49,35 @@ class ReviewController extends Controller
     /**
      * Create a new review.
      */
-    public function store(Request $request)
+    public function store(ReviewCreateRequest $request)
     {
-        $validated = $request->validate([
-            'appointment_id' => 'required|exists:appointments,id',
-            'review' => 'required|string',
-        ]);
-
         try {
-            $review = $this->reviewService->createReview($validated);
-            return response()->json(['data' => $review], 201);
+            $result = $this->reviewService->createReview($request);
+
+            if (!$result) {
+                return response()->json(
+                    [
+                        'status' => false,
+                        'message' => 'Review creation failed'
+                    ],
+                    404
+                );
+            }
+            return response()->json(
+                [
+                    'status' => true,
+                    'message' => 'Review created successfully'
+                ],
+                201
+            );
         } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 400);
+            return response()->json(
+                [
+                    'status' => false,
+                    'error' => $e->getMessage()
+                ],
+                400
+            );
         }
     }
 
@@ -54,26 +86,63 @@ class ReviewController extends Controller
      */
     public function show(Review $review)
     {
-        if (Gate::denies('show', $review)) {
-            throw new \Exception('You are not authorized to create a review for this appointment.');
+
+        $result = $this->reviewService->getReviewById($review);
+
+        if (!$result) {
+            return response()->json(
+                [
+                    'status' => false,
+                    'message' => 'Review not found'
+                ],
+                404
+            );
         }
-        return response()->json(['data' => $review], 200);
+
+        return response()->json(
+            [
+                'status' => true,
+                'message' => 'Review fetched successfully',
+                'data' => $result
+            ],
+            200
+        );
+        
     }
 
     /**
      * Update a specified review.
      */
-    public function update(Request $request, Review $review)
+    public function update(ReviewEditRequest $request, Review $review)
     {
-        $validated = $request->validate([
-            'review' => 'required|string',
-        ]);
-
         try {
-            $updatedReview = $this->reviewService->updateReview($review, $validated);
-            return response()->json(['data' => $updatedReview], 200);
+            $result = $this->reviewService->updateReview($review, $request);
+
+            if (!$result) {
+                return response()->json(
+                    [
+                        'status' => false,
+                        'message' => 'Review update failed'
+                    ],
+                    404
+                );
+            }
+
+            return response()->json(
+                [
+                    'status' => true,
+                    'message' => 'Review updated successfully'
+                ],
+                200
+            );
         } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 400);
+            return response()->json(
+                [
+                    'status' => false,
+                    'error' => $e->getMessage()
+                ],
+                400
+            );
         }
     }
 
@@ -83,10 +152,33 @@ class ReviewController extends Controller
     public function destroy(Review $review)
     {
         try {
-            $this->reviewService->deleteReview($review);
-            return response()->json(['message' => 'Review deleted successfully'], 200);
+            $result = $this->reviewService->deleteReview($review);
+
+            if (!$result) {
+                return response()->json(
+                    [
+                        'status' => false,
+                        'message' => 'Review deletion failed'
+                    ],
+                    404
+                );
+            }
+
+            return response()->json(
+                [
+                    'status' => true,
+                    'message' => 'Review deleted successfully'
+                ],
+                200
+            );
         } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 400);
+            return response()->json(
+                [
+                    'status' => false,
+                    'error' => $e->getMessage()
+                ],
+                400
+            );
         }
     }
 }

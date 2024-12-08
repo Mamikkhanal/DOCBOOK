@@ -21,17 +21,23 @@ class PaymentService
     public  function createPayment(string $id)
     {
         $appointment = Appointment::findOrFail($id);
-        $price = Service:: where('id', $appointment->service_id)->first()->price;
+
+        $price = Service::where('id', $appointment->service_id)->first()->price;
+
         $length = Carbon::parse($appointment->start_time)->diffInMinutes(Carbon::parse($appointment->end_time));
-        $price = $price * ($length/10);
+
+        $price = $price * ($length / 10);
 
         $payment = Payment::where('appointment_id', $appointment->id)->first();
 
         if ($payment) {
-            return response()->json(['success' => false, 'message' => 'Payment already created.']);
-        }
-        else
-        {
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Payment already created.'
+            ]);
+            
+        } else {
             Payment::create([
                 'user_id' => Patient::where('id', $appointment->patient_id)->first()->user_id,
                 'appointment_id' => $appointment->id,
@@ -39,7 +45,11 @@ class PaymentService
                 'amount' => $price,
                 'status' => 'unpaid',
             ]);
-            return response()->json(['success' => true, 'message' => 'Payment created.']);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Payment created.'
+            ]);
         }
     }
 }

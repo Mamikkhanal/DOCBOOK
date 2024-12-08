@@ -26,6 +26,11 @@ class SpecializationService
         return $this->specializationRepository->create($data);
     }
 
+    public function getSpecialization($id)
+    {
+        return $this->specializationRepository->find($id);
+    }
+
     public function updateSpecialization($specialization, $data)
     {
         return $this->specializationRepository->update($specialization, $data);

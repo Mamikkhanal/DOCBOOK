@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Models\Doctor;
 use App\Models\Patient;
 use Illuminate\Http\Request;
+use App\Services\UserService;
 use App\Services\RegisterService;
 use App\Http\Requests\LoginRequest;
 use App\Http\Controllers\Controller;
@@ -15,12 +16,31 @@ use App\Http\Requests\UserRegisterRequest;
 
 class UserController extends Controller
 {
+    protected $userService;
+
+    public function __construct(UserService $userService)
+    {
+        $this->userService = $userService;
+    }
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-     
+        $result = $this->userService->getUsers();
+
+        if ($result) {
+            return response()->json([
+                'status' => true,
+                'data' => $result
+            ], 200);
+        } else {
+            return response()->json([
+                'status' => false,
+                'message' => 'You are not authorized.'
+            ], 404);
+        }
     }
 
     /**
@@ -36,7 +56,20 @@ class UserController extends Controller
      */
     public function show(string $id)
     {
-        //
+
+        $result = $this->userService->getUserByID($id);
+
+        if ($result) {
+            return response()->json([
+                'status' => true,
+                'data' => $result
+            ], 200);
+        } else {
+            return response()->json([
+                'status' => false,
+                'message' => 'You are not authorized.'
+            ], 404);
+        }
     }
 
     /**
@@ -44,7 +77,19 @@ class UserController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $result = $this->userService->updateUser($request, $id);
+
+        if ($result) {
+            return response()->json([
+                'status' => true,
+                "message" => "User updated successfully",
+            ], 200);
+        } else {
+            return response()->json([
+                'status' => false,
+                'message' => 'You are not authorized.'
+            ], 404);
+        }
     }
 
     /**
@@ -52,36 +97,52 @@ class UserController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $result = $this->userService->deleteUser($id);
+
+        if ($result) {
+            return response()->json([
+                'status' => true,
+                "message" => "User deleted successfully",
+            ], 200);
+        } else {
+            return response()->json([
+                'status' => false,
+                'message' => 'You are not authorized.'
+            ], 404);
+        }
     }
-    // {
-    //     $user = User::create([
-    //         'name' => $request->name,
-    //         'email' => $request->email,
-    //         'password' => Hash::make($request->password),
-    //         'role'=>$request->role,
-    //         'phone'=>$request->phone
-    //     ]);
 
-    //     $token = $user->createToken('API Token')->plainTextToken;
+    public function addAdmin(Request $request)
+    {
+        $result = $this->userService->addAdmin($request);
 
-    //     if ($request->role == 'patient') {
-    //         Patient::create([
-    //             'user_id' => $user->id,
-    //             'age'=>$request->age,
-    //         ]);
-    //         return response()->json(['message' => 'User registered successfully as a patient', 'token' => $token], 201);
-    //     }
-    //     elseif ($request->role == 'doctor') {
-    //         Doctor::create([
-    //             'user_id' => $user->id,
-    //             'specialization'=>$request->specialization,
-    //         ]);
-    //         return response()->json(['message' => 'User registered successfully as a doctor', 'token' => $token], 201);
-    //     }
+        if ($result) {
+            return response()->json([
+                'status' => true,
+                "message" => "Admin added successfully",
+            ], 200);
+        } else {
+            return response()->json([
+                'status' => false,
+                'message' => 'You are not authorized.'
+            ], 404);
+        }
+    }
 
-    //     return response()->json(['message' => 'User registered successfully', 'token' => $token], 201);
-    // }
+    public function editAdmin(Request $request, $id)
+    {
+        $result = $this->userService->editAdmin($request, $id);
 
- 
+        if ($result) {
+            return response()->json([            
+                'status' => true,
+                "message" => "Admin updated successfully",
+            ], 200);        
+        } else {
+            return response()->json([
+                'status' => false,
+                'message' => 'You are not authorized.'
+            ], 404);
+        }
+    }   
 }

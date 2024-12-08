@@ -19,9 +19,16 @@ class IsPatient
             $user = Auth::user();
     
             if ($user && $user->role == "patient") {
+                
                 return $next($request); 
             }
             
-            return response()->json(['error' => 'Unauthorized'], 403);
+            return response()->json(
+                [
+                    'status' => false,
+                    'message' => 'You are not authorized to access this route.'
+                ],
+                403
+            );
         }
 }

@@ -17,11 +17,11 @@ class RegisterService
 
     public function registerUser(array $data)
     {
-        // Start transaction
+
         DB::beginTransaction();
 
         try {
-            // Create User
+
             $user = $this->userRepository->createUser([
                 'name' => $data['name'],
                 'email' => $data['email'],
@@ -30,23 +30,23 @@ class RegisterService
                 'phone' => $data['phone'],
             ]);
 
-            // Role-specific logic
             if ($data['role'] === 'patient') {
+
                 $this->userRepository->createPatient([
                     'user_id' => $user->id,
                     'age' => $data['age'],
                 ]);
+
             } elseif ($data['role'] === 'doctor') {
+
                 $this->userRepository->createDoctor([
                     'user_id' => $user->id,
                     'specialization' => $data['specialization'],
                 ]);
             }
 
-            // Commit transaction
             DB::commit();
 
-            // Generate token
             $token = $user->createToken('API Token')->plainTextToken;
 
             return [
@@ -57,8 +57,9 @@ class RegisterService
                     'token' => $token,
                 ],
             ];
+
         } catch (\Exception $e) {
-            // Rollback transaction on error
+            
             DB::rollBack();
 
             return [

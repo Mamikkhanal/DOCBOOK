@@ -25,9 +25,10 @@ class AppointmentController extends Controller
     {
         $request->validate(['search' => 'required|string']);
         $result = $this->appointmentService->searchAppointments($request);
-        return response()->json($result);
+
+        return $result;
     }
-    
+
     /**
      * Display all appointments according to roles
      */
@@ -35,20 +36,19 @@ class AppointmentController extends Controller
     {
         $result = $this->appointmentService->getAllAppointments();
 
-        return response()->json($result); 
+        return $result;
     }
-    
+
     /**
      * Store a newly created appointment.
      */
-    
+
     public function store(AppointmentCreateRequest $request)
     {
 
         $result = $this->appointmentService->createAppointment($request);
 
-        return response()->json($result);
-
+        return $result;
     }
 
     /**
@@ -58,7 +58,7 @@ class AppointmentController extends Controller
     {
         $result = $this->appointmentService->getAppointment($id);
 
-        return response()->json($result);
+        return $result;
     }
 
     /**
@@ -68,7 +68,7 @@ class AppointmentController extends Controller
     {
         $result = $this->appointmentService->updateAppointment($request, $id);
 
-        return response()->json($result);
+        return $result;
     }
 
     /**
@@ -78,6 +78,6 @@ class AppointmentController extends Controller
     {
         $result = $this->appointmentService->deleteAppointment($id);
 
-        return response()->json($result);
+        return $result;
     }
 }
