@@ -113,7 +113,7 @@ class PaymentController extends Controller
                         'status' => 'paid',
                     ]);
 
-                    Mail::to($payment->user->email)->send(new \App\Mail\PaymentMail($payment));
+                    Mail::to($payment->appointment->patient->user->email)->send(new \App\Mail\PaymentMail($payment));
 
                     return response()->json(['success' => true, 'message' => 'Payment successful.'],200);
                 }else{

@@ -12,6 +12,9 @@ use App\Http\Requests\LoginRequest;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use App\Http\Requests\AdminAddRequest;
+use App\Http\Requests\UserEditRequest;
+use App\Http\Requests\AdminEditRequest;
 use App\Http\Requests\UserRegisterRequest;
 
 class UserController extends Controller
@@ -75,7 +78,7 @@ class UserController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(UserEditRequest $request, string $id)
     {
         $result = $this->userService->updateUser($request, $id);
 
@@ -112,7 +115,7 @@ class UserController extends Controller
         }
     }
 
-    public function addAdmin(Request $request)
+    public function addAdmin(AdminAddRequest $request)
     {
         $result = $this->userService->addAdmin($request);
 
@@ -129,7 +132,7 @@ class UserController extends Controller
         }
     }
 
-    public function editAdmin(Request $request, $id)
+    public function editAdmin(AdminEditRequest $request, $id)
     {
         $result = $this->userService->editAdmin($request, $id);
 

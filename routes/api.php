@@ -9,7 +9,9 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\SlotController;
 use App\Http\Controllers\Api\V1\UserController;
+use App\Http\Controllers\Api\V1\DoctorController;
 use App\Http\Controllers\Api\V1\ReviewController;
+use App\Http\Controllers\Api\V1\PatientController;
 use App\Http\Controllers\Api\V1\PaymentController;
 use App\Http\Controllers\Api\V1\ServiceController;
 use App\Http\Controllers\Api\V1\ScheduleController;
@@ -22,49 +24,55 @@ Route::get('/user', function (Request $request) {
 
 Route::prefix('v1')->group(function () {
 
-
+    
     Route::post('/register', [AuthController::class, 'register'])->name('register');
     Route::post('/login', [AuthController::class, 'login'])->name('login');
-
+    
     Route::middleware('auth:sanctum')->group(function () {
         Route::post('/logout', [AuthController::class, 'logout']);
     });
-
-
+    
+    
     Route::name('api.')->group(function () {
-
+        
         Route::middleware('auth:sanctum')->group(function () {
+            
+            Route::apiResource('/users', UserController::class);
+            Route::apiResource('/doctors', DoctorController::class);
+            Route::apiResource('/patients', PatientController::class);
             
             Route::get('/services', [ServiceController::class, 'index']);
             Route::get('/specializations', [SpecializationController::class, 'index']);
             Route::get('/schedules', [ScheduleController::class, 'index']);
             Route::get('/slots', [SlotController::class, 'index']);
-
+            
             Route::get('/appointments', [AppointmentController::class, 'index']);
             Route::get('/appointments/search', [AppointmentController::class, 'search']);
             Route::get('/appointments/{appointment}', [AppointmentController::class, 'show']);
-
+            
             Route::get('/payments/{id}/pay', [PaymentController::class, 'pay'])->name('payment.pay');
             Route::get('/payments/success', [PaymentController::class, 'success'])->name('payment.success');
             Route::get('/payments/failure', [PaymentController::class, 'failure'])->name('payment.failure');
-
-
+            
             Route::middleware('IsAdmin')->group(function () {
-
+                
+                Route::post('/admin/add', [UserController::class, 'addAdmin'])->name('admin.add');
+                Route::put('/admin/edit/{id}', [UserController::class, 'editAdmin'])->name('admin.edit');
+                
                 Route::post('/services', [ServiceController::class, 'store']);
                 Route::get('/services/{service}', [ServiceController::class, 'show']);
                 Route::put('/services/{service}', [ServiceController::class, 'update']);
                 Route::delete('/services/{service}', [ServiceController::class, 'destroy']);
-
+                
                 Route::post('/specializations', [SpecializationController::class, 'store']);
                 Route::get('/specializations/{specialization}', [SpecializationController::class, 'show']);
                 Route::put('/specializations/{specialization}', [SpecializationController::class, 'update']);
                 Route::delete('/specializations/{specialization}', [SpecializationController::class, 'destroy']);
-
+                
             });
-
+            
             Route::middleware('IsDoctor')->group(function () {
-
+                
                 Route::post('/schedules', [ScheduleController::class, 'store']);
                 Route::get('/schedules/{schedule}', [ScheduleController::class, 'show']);
                 Route::put('/schedules/{schedule}', [ScheduleController::class, 'update']);
@@ -83,7 +91,7 @@ Route::prefix('v1')->group(function () {
             Route::middleware('IsPatient')->group(function () {
                 
                 Route::post('/appointments', [AppointmentController::class, 'store']);
-
+                
                 Route::apiResource('/reviews', ReviewController::class);
             });
         });

@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Specialization;
 use App\Repositories\UserRepository;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -39,10 +40,19 @@ class RegisterService
 
             } elseif ($data['role'] === 'doctor') {
 
-                $this->userRepository->createDoctor([
-                    'user_id' => $user->id,
-                    'specialization' => $data['specialization'],
-                ]);
+                $specialization =  Specialization::all();
+                $request = false;
+                foreach ($specialization as $spec) {
+                    if ($spec->name === $data['specialization']) {
+                        return $request=(true);
+                    }
+                }
+                if (!$request) {
+                    $this->userRepository->createDoctor([
+                        'user_id' => $user->id,
+                        'specialization' => $data['specialization'],
+                    ]);  
+                }
             }
 
             DB::commit();

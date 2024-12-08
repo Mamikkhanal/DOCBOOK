@@ -4,14 +4,14 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class UserRegisterRequest extends FormRequest
+class AdminEditRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        return true;
+        return false;
     }
 
     /**
@@ -25,16 +25,8 @@ class UserRegisterRequest extends FormRequest
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users',
             'password' => 'required|min:8|confirmed',
-            'role' => ['required', 'in:patient,doctor'],
+            'role'=>['required', 'in:admin'],
             'phone' => ['required', 'string', 'min:10'],
         ];
-
-        if ($this->input('role') === 'patient') {
-            $rules['age'] = ['required', 'integer', 'min:1','max:120'];
-        }
-    
-        if ($this->input('role') === 'doctor') {
-            $rules['specialization'] = ['required', 'string'];
-        }
     }
 }

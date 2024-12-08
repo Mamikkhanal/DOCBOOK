@@ -2,17 +2,37 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Services\PatientService;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\PatientEditRequest;
 
 class PatientController extends Controller
 {
+    protected $patientService;
+
+    public function __construct(PatientService $patientService)
+    {
+        $this->patientService = $patientService;
+    }
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        //
+        $result = $this->patientService->getAllPatients();
+
+        if (!$result) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Patient not found',
+            ], 404);
+        }
+
+        return response()->json([
+            'status' => true,
+            'data' => $result
+        ], 200);
     }
 
     /**
@@ -20,7 +40,20 @@ class PatientController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        // $result = $this->patientService->createPatient($request->all());
+
+        // if (!$result) {
+        //     return response()->json([
+        //         'status' => false,
+        //         'message' => 'Patient not found',
+        //     ], 404);
+        // }
+
+        // return response()->json([
+        //     'status' => true,
+        //     'message' => 'Patient created successfully',
+        //     'data' => $result
+        // ], 201);
     }
 
     /**
@@ -28,15 +61,39 @@ class PatientController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $result = $this->patientService->getPatient($id);
+
+        if (!$result) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Patient not found',
+            ], 404);
+        }
+
+        return response()->json([
+            'status' => true,
+            'data' => $result
+        ], 200);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(PatientEditRequest $request, string $id)
     {
-        //
+        $result = $this->patientService->updatePatient($id, $request->all());
+
+        if (!$result) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Patient not found',
+            ], 404);
+        }
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Patient updated successfully',
+        ], 200);
     }
 
     /**
@@ -44,6 +101,18 @@ class PatientController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $result = $this->patientService->deletePatient($id);
+
+        if (!$result) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Patient not found',
+            ], 404);
+        }
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Patient deleted successfully',
+        ], 200);
     }
 }
