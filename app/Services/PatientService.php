@@ -19,14 +19,25 @@ class PatientService
 
     public function getAllPatients()
     {
-        return $this->patientRepository->all();
+        if(Auth::user()->role == 'admin'){
+            $data = $this->patientRepository->all();
+            return response()->json(['status' => true, 'data' => $data], 200);
+        }
+        else{
+            return response()->json(
+                [
+                    'status' => false,
+                    'message' => 'You are not authorized to view this data.'
+                ],
+                403
+            );
+        }   
     }
 
     public function getPatient($id)
     {
-        $patient = Patient::where('user_id', Auth::user()->id)->first();
-
-        if ($patient->id == $id) {
+        $user= Auth::user();
+        if ($user->role == 'patient' && $user->patient->id == $id) {
             $data =$this->patientRepository->find($id);
 
             return response()->json(['status' => true, 'data' => $data], 200);
@@ -47,9 +58,8 @@ class PatientService
 
     public function updatePatient($id, array $data)
     {
-        $patient = Patient::where('user_id', Auth::user()->id)->first();
-
-        if ($patient->id == $id) {
+        $user= Auth::user();
+        if ($user->role == 'patient' && $user->patient->id == $id) {
             $this->patientRepository->update($id, $data);
 
             return response()->json(['status' => true, 'message' => 'Patient updated successfully'], 200);
@@ -65,9 +75,8 @@ class PatientService
 
     public function deletePatient($id)
     {
-        $patient = Patient::where('user_id', Auth::user()->id)->first();
-
-        if ($patient->id == $id) {
+        $user= Auth::user();
+        if ($user->role == 'patient' && $user->patient->id == $id) {
             $this->patientRepository->delete($id);
             return response()->json(['status' => true, 'message' => 'Patient deleted successfully'], 200);
         } else

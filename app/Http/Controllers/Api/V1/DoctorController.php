@@ -28,10 +28,7 @@ class DoctorController extends Controller
                 'message' => 'No doctors found'
             ], 404);
         }
-        return response()->json([
-            'status' => true,
-            'data' => $result
-        ], 200);
+        return $result;
     }
 
     /**
@@ -69,10 +66,7 @@ class DoctorController extends Controller
                 'message' => 'No doctor found'
             ], 404);
         }
-        return response()->json([
-            'status' => true,
-            'data' => $result
-        ], 200);
+        return $result;
     }
 
     /**

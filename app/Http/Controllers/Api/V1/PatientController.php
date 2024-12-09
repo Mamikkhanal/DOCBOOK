@@ -29,10 +29,7 @@ class PatientController extends Controller
             ], 404);
         }
 
-        return response()->json([
-            'status' => true,
-            'data' => $result
-        ], 200);
+        return $result;
     }
 
     /**

@@ -19,7 +19,19 @@ class DoctorService
 
     public function getAllDoctors()
     {
-        return $this->doctorRepository->all();
+        if(Auth::user()->role == 'admin'){
+            $data = $this->doctorRepository->all();
+            return response()->json(['status' => true, 'data' => $data], 200);
+        }
+        else{
+            return response()->json(
+                [
+                    'status' => false,
+                    'message' => 'You are not authorized to view this data.'
+                ],
+                403
+            );
+        }
     }
 
     public function createDoctor(array $data)
@@ -30,10 +42,10 @@ class DoctorService
     public function getDoctor($id)
     {
 
-        $doctor = Doctor::where('user_id', Auth::user()->id)->first();
-
-        if ($doctor->id == $id) {
-            return $this->doctorRepository->find($id);
+        $user = Auth::user();
+        if ($user->role == 'doctor' && $user->doctor->id == $id) {
+            $data= $this->doctorRepository->find($id);
+            return response()->json(['status' => true, 'data' => $data], 200);
         } else
             return response()->json(
                 [
@@ -46,9 +58,8 @@ class DoctorService
 
     public function updateDoctor($id, array $data)
     {
-        $doctor = Doctor::where('user_id', Auth::user()->id)->first();
-
-        if ($doctor->id == $id) {
+        $user = Auth::user();
+        if ($user->role == 'doctor' && $user->doctor->id == $id) {
             $this->doctorRepository->update($id, $data);
             return response()->json(
                 [
@@ -68,9 +79,8 @@ class DoctorService
 
     public function deleteDoctor($id)
     {
-        $doctor = Doctor::where('user_id', Auth::user()->id)->first();
-
-        if ($doctor->id == $id) {
+        $user = Auth::user();
+        if ($user->role == 'doctor' && $user->doctor->id == $id) {
             $this->doctorRepository->delete($id);
             return response()->json(
                 [
