@@ -27,7 +27,7 @@ class ScheduleController extends Controller
     {
         $schedules = $this->scheduleService->getSchedulesForDoctor();
 
-        if (!$schedules) {
+        if (!$schedules || $schedules->isEmpty()) {
             return response()->json([
                 'status' => false,
                 'message' => 'No schedules found'
@@ -46,18 +46,15 @@ class ScheduleController extends Controller
     {
         $data = $request->validated();
         try {
-            $schedule = $this->scheduleService->createSchedule($data);
+            $result = $this->scheduleService->createSchedule($data);
 
-            if (!$schedule) {
+            if (!$result) {
                 return response()->json([
                     'status' => false,
                     'message' => 'Schedule creation failed'
                 ], 400);
             }
-            return response()->json([
-                'status' => true,
-                'message' => 'Schedule created successfully'
-            ], 201);
+            return $result;
         } catch (\Exception $e) {
 
             return response()->json([
@@ -80,10 +77,7 @@ class ScheduleController extends Controller
                 'message' => 'Schedule not found'
             ], 404);
         }
-        return response()->json([
-            'status' => true,
-            'data' => $result
-        ], 200);
+        return $result;
     }
 
     /**
@@ -105,10 +99,7 @@ class ScheduleController extends Controller
                 ], 400);
             }
 
-            return response()->json([
-                'status' => true,
-                'message' => 'Schedule updated successfully',
-            ], 200);
+            return $result;
         } catch (\Exception $e) {
 
             return response()->json([
@@ -134,14 +125,7 @@ class ScheduleController extends Controller
                     'message' => 'Schedule deletion failed'
                 ], 400);
             }
-            return response()->json(
-                [
-                    'status' => true,
-                    'message' => 'Schedule deleted successfully',
-                    'data' => [$result]
-                ],
-                200
-            );
+            return $result;
         } catch (\Exception $e) {
 
             return response()->json([

@@ -26,6 +26,14 @@ class ReviewController extends Controller
     {
         try {
             $reviews = $this->reviewService->getReviewsForCurrentUser();
+            if($reviews->isEmpty()){
+                return response()->json(
+                    [
+                        'status' => false,
+                        'message' => 'No reviews found'
+                    ],404
+                );
+            }
             return response()->json(
                 [
                     'status' => true,
@@ -51,8 +59,9 @@ class ReviewController extends Controller
      */
     public function store(ReviewCreateRequest $request)
     {
+        $data = $request->validated();
         try {
-            $result = $this->reviewService->createReview($request);
+            $result = $this->reviewService->createReview($data);
 
             if (!$result) {
                 return response()->json(
@@ -63,13 +72,7 @@ class ReviewController extends Controller
                     404
                 );
             }
-            return response()->json(
-                [
-                    'status' => true,
-                    'message' => 'Review created successfully'
-                ],
-                201
-            );
+            return $result;
         } catch (\Exception $e) {
             return response()->json(
                 [
@@ -115,8 +118,9 @@ class ReviewController extends Controller
      */
     public function update(ReviewEditRequest $request, Review $review)
     {
+        $data = $request->validated();
         try {
-            $result = $this->reviewService->updateReview($review, $request);
+            $result = $this->reviewService->updateReview($review, $data);
 
             if (!$result) {
                 return response()->json(
@@ -128,13 +132,7 @@ class ReviewController extends Controller
                 );
             }
 
-            return response()->json(
-                [
-                    'status' => true,
-                    'message' => 'Review updated successfully'
-                ],
-                200
-            );
+            return $result;
         } catch (\Exception $e) {
             return response()->json(
                 [
@@ -164,13 +162,7 @@ class ReviewController extends Controller
                 );
             }
 
-            return response()->json(
-                [
-                    'status' => true,
-                    'message' => 'Review deleted successfully'
-                ],
-                200
-            );
+            return $result;
         } catch (\Exception $e) {
             return response()->json(
                 [

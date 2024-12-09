@@ -70,10 +70,7 @@ class PatientController extends Controller
             ], 404);
         }
 
-        return response()->json([
-            'status' => true,
-            'data' => $result
-        ], 200);
+        return $result;
     }
 
     /**
@@ -90,10 +87,7 @@ class PatientController extends Controller
             ], 404);
         }
 
-        return response()->json([
-            'status' => true,
-            'message' => 'Patient updated successfully',
-        ], 200);
+        return $result;
     }
 
     /**
@@ -110,9 +104,6 @@ class PatientController extends Controller
             ], 404);
         }
 
-        return response()->json([
-            'status' => true,
-            'message' => 'Patient deleted successfully',
-        ], 200);
+        return $result;
     }
 }

@@ -19,23 +19,27 @@ class ServiceRepository
         return Service::all();
     }
 
-    public function find($id)
+
+    public function find($slug)
     {
-        return Service::findOrFail($id);
+        return Service::where('slug', $slug)->first();
     }
 
     public function create(array $data)
     {
+        $data['slug'] = strtolower($data['name']);
         return Service::create($data);
     }
 
-    public function update(Service $service, array $data)
+    public function update($slug, array $data)
     {
+        $service = Service::where('slug', $slug)->first();
         return $service->update($data);
     }
 
-    public function delete(Service $service)
+    public function delete($slug)
     {
+        $service = Service::where('slug', $slug)->first();
         return $service->delete();
     }
 

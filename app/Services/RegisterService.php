@@ -41,13 +41,13 @@ class RegisterService
             } elseif ($data['role'] === 'doctor') {
 
                 $specialization =  Specialization::all();
-                $request = false;
+                $check = false;
                 foreach ($specialization as $spec) {
                     if ($spec->name === $data['specialization']) {
-                        return $request=(true);
+                        $check=(true);
                     }
                 }
-                if (!$request) {
+                if ($check) {
                     $this->userRepository->createDoctor([
                         'user_id' => $user->id,
                         'specialization' => $data['specialization'],

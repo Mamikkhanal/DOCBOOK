@@ -84,9 +84,10 @@ class SpecializationController extends Controller
      */
     public function update(SpecializationEditRequest $request, Specialization $specialization)
     {
-        $specialization = $this->specializationService->updateSpecialization($specialization, $request['data']);
+        $data = $request->validated();
+        $result = $this->specializationService->updateSpecialization($specialization, $data);
 
-        if (!$specialization) {
+        if (!$result) {
             return response()->json([
                 'status' => false,
                 'message' => 'Specialization update failed'

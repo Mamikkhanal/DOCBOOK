@@ -42,7 +42,7 @@ class AppointmentController extends Controller
     {
         $result = $this->appointmentService->getAllAppointments();
 
-        if (!$result) {
+        if (!$result || $result->isEmpty()) {
             return response()->json(
                 [
                     'success' => false,
@@ -80,13 +80,7 @@ class AppointmentController extends Controller
             );
         }
 
-        return response()->json(
-            [
-                'success' => true,
-                'message' => 'Appointment created successfully',
-            ],
-            201
-        );
+        return $result;
     }
 
     /**
@@ -132,13 +126,18 @@ class AppointmentController extends Controller
             );
         }
 
+        if($result == 'Appointment updated successfully.'){
         return response()->json(
             [
                 'success' => true,
-                'message' => 'Appointment updated successfully',
+                'message' => $result
             ],
             200
         );
+        }
+        else{
+            return $result;
+        }
     }
 
     /**
@@ -158,12 +157,23 @@ class AppointmentController extends Controller
             );
         }
 
+        if ($result == 'Appointment deleted successfully.') {
         return response()->json(
             [
                 'success' => true,
-                'message' => 'Appointment deleted successfully',
+                'message' => $result,
             ],
             200 
         );
+        }
+        elseif($result == 'You are not authorized to delete this appointment'){
+            return response()->json(
+                [
+                    'success' => false,
+                    'message' => $result,
+                ],
+                403
+            );  
+        }
     }
 }

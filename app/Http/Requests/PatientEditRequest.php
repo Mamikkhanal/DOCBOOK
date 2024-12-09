@@ -11,7 +11,7 @@ class PatientEditRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,7 @@ class PatientEditRequest extends FormRequest
     public function rules(): array
     {
         return [
-            "age" =>'required', 'integer', 'min:1', 'max:120'
+            "age" =>['required', 'integer', 'min:1', 'max:120']
         ];
     }
 }

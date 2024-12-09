@@ -26,18 +26,18 @@ class ServiceService
        return $this->serviceRepository->create($data);
     }
 
-    public function getService($id)
+    public function getService($service)
     {
-        return $this->serviceRepository->find($id);
+        return $this->serviceRepository->find($service->slug);
     }
 
     public function updateService($service, $data)
     {
-       return $this->serviceRepository->update($service, $data);
+       return $this->serviceRepository->update($service->slug, $data);
     }
 
     public function deleteService($service)
     {
-        return $this->serviceRepository->delete($service);
+        return $this->serviceRepository->delete($service->slug);
     }
 }

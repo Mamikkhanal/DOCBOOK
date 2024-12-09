@@ -22,7 +22,7 @@ class ReviewEditRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'review_id' => 'required|exists:reviews,id',
+            'id' => 'required|exists:reviews,id',
             'review' => 'required|string',
         ];
     }

@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Specialization;
 use App\Repositories\SpecializationRepository;
 
 class SpecializationService
@@ -26,18 +27,18 @@ class SpecializationService
         return $this->specializationRepository->create($data);
     }
 
-    public function getSpecialization($id)
+    public function getSpecialization(Specialization $specialization)
     {
-        return $this->specializationRepository->find($id);
+        return $this->specializationRepository->find($specialization->slug);
     }
 
-    public function updateSpecialization($specialization, $data)
+    public function updateSpecialization(Specialization $specialization, $data)
     {
-        return $this->specializationRepository->update($specialization, $data);
+        return $this->specializationRepository->update($specialization->slug, $data);
     }
 
     public function deleteSpecialization($specialization)
     {
-        return $this->specializationRepository->delete($specialization);
+        return $this->specializationRepository->delete($specialization->slug);
     }
 }

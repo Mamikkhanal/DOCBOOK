@@ -118,10 +118,10 @@ class AppointmentService
 
         if ($schedules->isEmpty()) {
 
-            return response()->json([
+            return([
                 'success' => false,
                 'message' => 'No schedule found for the doctor.',
-            ], 404);
+            ]);
 
         } else {
 
@@ -234,7 +234,6 @@ class AppointmentService
                         return response()->json([
                             'success' => false,
                             'message' => 'Slot is already booked.',
-                            'data' => $slots,
                         ], 422);
                     }
 
@@ -320,14 +319,14 @@ class AppointmentService
                 Mail::to($appointment->patient->user->email)->send(new AppointmentCancelled($appointment));
             }
 
-            return (true);
+            return ('Appointment updated successfully.');
 
         } else {
 
             return response()->json([
                 'success' => false,
                 'message' => 'You are not authorized to update this appointment.',
-            ], 403);
+            ],403);
         }
     }
 
@@ -341,14 +340,11 @@ class AppointmentService
            
             $appointment->delete();
             
-            return (true);
+            return ('Appointment deleted successfully.');
 
         } else {
 
-            return response()->json([
-                'success' => false,
-                'message' => 'You are not authorized to delete this appointment.',
-            ], 403);
+            return ('You are not authorized to delete this appointment');
         }
     }
 }

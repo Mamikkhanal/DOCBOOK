@@ -28,6 +28,21 @@ class ReviewService
 
     public function createReview($data)
     {
+        $review = new Review();
+        $review->appointment_id = $data['appointment_id'];
+        $review->review = $data['review'];
+
+        if (Gate::denies('create', $review)) {
+
+            return response()->json(
+                [
+                    'success' => false,
+                    'message' => 'You are not authorized to create a review for this appointment.'
+                ],
+                403
+            );
+        }
+
         $existingReview = $this->reviewRepository->findByAppointmentId($data['appointment_id']);
 
         if ($existingReview) {
@@ -41,19 +56,13 @@ class ReviewService
             );
         }
 
-        $review = new Review($data);
-
-        if (Gate::denies('create', $review)) {
-
-            return response()->json(
-                [
-                    'success' => false,
-                    'message' => 'You are not authorized to create a review for this appointment.'
-                ],
-                403
-            );
-        }
-        return $this->reviewRepository->createReview($data);
+        $this->reviewRepository->createReview($data);
+        return response ()->json(
+            [
+                'success' => true,
+                'message' => 'Review created successfully.'
+            ],201
+        );
     }
 
     public function getReviewById($review)
@@ -85,7 +94,15 @@ class ReviewService
             );
         }
 
-        return  $this->reviewRepository->updateReview($review, $data);
+        $this->reviewRepository->updateReview($review, $data);
+
+        return response()->json(
+            [
+                'success' => true,
+                'message' => 'Review updated successfully.'
+            ],
+            200
+        );
     }
 
     public function deleteReview($review)
@@ -101,6 +118,14 @@ class ReviewService
             );
         }
         
-        return $this->reviewRepository->deleteReview($review);
+        $this->reviewRepository->deleteReview($review);
+
+        return response()->json(
+            [
+                'success' => true,
+                'message' => 'Review deleted successfully.'
+            ],
+            200
+        );
     }
 }

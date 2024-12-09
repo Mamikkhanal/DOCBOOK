@@ -27,7 +27,7 @@ class UserController extends Controller
     }
 
     /**
-     * Display a listing of the resource.
+     * Display a list of users
      */
     public function index()
     {
@@ -47,7 +47,7 @@ class UserController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Store a newly created user.
      */
     public function store(Request $request)
     {
@@ -55,7 +55,7 @@ class UserController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * Display a specified user.
      */
     public function show(string $id)
     {
@@ -76,7 +76,7 @@ class UserController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * Update the specified user.
      */
     public function update(UserEditRequest $request, string $id)
     {
@@ -96,7 +96,7 @@ class UserController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Delete the specified user.
      */
     public function destroy(string $id)
     {
@@ -115,9 +115,15 @@ class UserController extends Controller
         }
     }
 
+    /**
+     * Add an admin
+     */
+
     public function addAdmin(AdminAddRequest $request)
     {
-        $result = $this->userService->addAdmin($request);
+        $data = $request->validated();
+    
+        $result = $this->userService->addAdmin($data);
 
         if ($result) {
             return response()->json([
@@ -132,6 +138,9 @@ class UserController extends Controller
         }
     }
 
+    /**
+     * Update the specified admin
+     */
     public function editAdmin(AdminEditRequest $request, $id)
     {
         $result = $this->userService->editAdmin($request, $id);

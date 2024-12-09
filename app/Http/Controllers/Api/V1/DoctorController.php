@@ -88,11 +88,7 @@ class DoctorController extends Controller
                 'message' => 'Doctor update failed'
             ], 500);
         }
-        return response()->json([
-            'status' => true,
-            'message' => 'Doctor updated successfully',
-            'data' => $result
-        ], 200);
+        return $result;
     }
 
     /**
@@ -108,9 +104,6 @@ class DoctorController extends Controller
                 'message' => 'Doctor deletion failed'
             ], 500);
         }
-        return response()->json([
-            'status' => true,
-            'message' => 'Doctor deleted successfully'
-        ], 200);
+        return $result;
     }
 }

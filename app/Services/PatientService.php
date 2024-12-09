@@ -27,7 +27,9 @@ class PatientService
         $patient = Patient::where('user_id', Auth::user()->id)->first();
 
         if ($patient->id == $id) {
-            return $this->patientRepository->find($id);
+            $data =$this->patientRepository->find($id);
+
+            return response()->json(['status' => true, 'data' => $data], 200);
         } else
             return response()->json(
                 [
@@ -48,7 +50,9 @@ class PatientService
         $patient = Patient::where('user_id', Auth::user()->id)->first();
 
         if ($patient->id == $id) {
-            return $this->patientRepository->update($id, $data);
+            $this->patientRepository->update($id, $data);
+
+            return response()->json(['status' => true, 'message' => 'Patient updated successfully'], 200);
         } else
             return response()->json(
                 [
@@ -64,7 +68,8 @@ class PatientService
         $patient = Patient::where('user_id', Auth::user()->id)->first();
 
         if ($patient->id == $id) {
-            return $this->patientRepository->delete($id);
+            $this->patientRepository->delete($id);
+            return response()->json(['status' => true, 'message' => 'Patient deleted successfully'], 200);
         } else
             return response()->json(
                 [

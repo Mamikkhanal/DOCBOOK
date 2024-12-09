@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Specialization;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UserRegisterRequest extends FormRequest
@@ -21,20 +22,29 @@ class UserRegisterRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
+        $rules = [
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users',
             'password' => 'required|min:8|confirmed',
             'role' => ['required', 'in:patient,doctor'],
             'phone' => ['required', 'string', 'min:10'],
         ];
-
+    
         if ($this->input('role') === 'patient') {
-            $rules['age'] = ['required', 'integer', 'min:1','max:120'];
+            $rules['age'] = ['required', 'integer', 'min:1', 'max:120'];
         }
     
         if ($this->input('role') === 'doctor') {
-            $rules['specialization'] = ['required', 'string'];
+            $rules ['specialization'] = [
+                'required',
+                function ($attribute, $value, $fail) {
+                    if (!Specialization::where('name', $value)->exists()) {
+                        $fail("The selected {$attribute} is invalid.");
+                    }
+                },
+            ];
         }
+    
+        return $rules;
     }
 }

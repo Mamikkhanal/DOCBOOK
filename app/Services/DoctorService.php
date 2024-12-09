@@ -49,7 +49,13 @@ class DoctorService
         $doctor = Doctor::where('user_id', Auth::user()->id)->first();
 
         if ($doctor->id == $id) {
-            return $this->doctorRepository->update($id, $data);
+            $this->doctorRepository->update($id, $data);
+            return response()->json(
+                [
+                    'status' => true,
+                    'message' => 'Doctor updated successfully'
+                ],200
+            );
         } else
             return response()->json(
                 [
@@ -65,7 +71,13 @@ class DoctorService
         $doctor = Doctor::where('user_id', Auth::user()->id)->first();
 
         if ($doctor->id == $id) {
-            return $this->doctorRepository->delete($id);
+            $this->doctorRepository->delete($id);
+            return response()->json(
+                [
+                    'status' => true,
+                    'message' => 'Doctor deleted successfully'
+                ],200
+            );
         } else return response()->json(
             [
                 'status' => false,
