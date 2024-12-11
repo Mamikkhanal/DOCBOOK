@@ -19,7 +19,7 @@ class DoctorService
 
     public function getAllDoctors()
     {
-        if(Auth::user()->role == 'admin'){
+        if(Auth::user()->role == 'admin' || Auth::user()->role == 'patient'){
             $data = $this->doctorRepository->all();
             return response()->json(['status' => true, 'data' => $data], 200);
         }

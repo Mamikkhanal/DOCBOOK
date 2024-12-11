@@ -100,13 +100,7 @@ class AppointmentController extends Controller
             );
         }   
 
-        return response()->json(
-            [
-                'success' => true,
-                'data' => $result
-            ],
-            200     
-        );
+        return $result;
     }
 
     /**

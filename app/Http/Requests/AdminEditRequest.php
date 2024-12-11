@@ -24,9 +24,9 @@ class AdminEditRequest extends FormRequest
         return [
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users',
-            'password' => 'required|min:8|confirmed',
+            // 'password' => 'required|min:8|confirmed',
+            // 'phone' => ['required', 'string', 'min:10'],
             'role'=>['required', 'in:admin'],
-            'phone' => ['required', 'string', 'min:10'],
         ];
     }
 }

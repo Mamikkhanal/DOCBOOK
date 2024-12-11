@@ -296,7 +296,14 @@ class AppointmentService
                     'message' => 'You cannot make an already booked appointment pending.',
                 ], 422);
 
-            } elseif ($appointment->status == 'completed' && $request->status == 'booked' || $request->status == 'pending' || $request->status == 'cancelled') {
+            } elseif ($appointment->status == 'booked' && $request->status == 'cancelled') {
+
+                return response()->json([
+                    'success' => false,
+                    'message' => 'You cannot cancel an already booked appointment.',
+                ], 422);
+            }
+            elseif ($appointment->status == 'completed') {
                 
                 return response()->json([
                     'success' => false,

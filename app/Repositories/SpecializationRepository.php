@@ -33,6 +33,7 @@ class SpecializationRepository
     public function update($slug, array $data)
     {
         $specialization = Specialization::where('slug', $slug)->first();
+        $data['slug'] = strtolower($data['name']);
         return $specialization->update($data);
     }
 

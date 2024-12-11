@@ -34,6 +34,7 @@ class ServiceRepository
     public function update($slug, array $data)
     {
         $service = Service::where('slug', $slug)->first();
+        $data['slug'] = strtolower($data['name']);
         return $service->update($data);
     }
 

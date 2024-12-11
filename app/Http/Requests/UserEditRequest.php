@@ -22,11 +22,11 @@ class UserEditRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users',
+            'name' => 'required|string|max:255,nullable',
+            'email' => 'required|email|unique:users,nullable',
             'password' => 'required|min:8|confirmed',
-            'role'=>['required', 'in:patient,doctor'],
-            'phone' => ['required', 'string', 'min:10'],
+            'role'=>['required', 'in:patient,doctor','nullable'],
+            'phone' => ['required', 'string', 'min:10,nullable'],
         ];
     }
 }

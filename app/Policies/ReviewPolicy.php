@@ -35,6 +35,5 @@ class ReviewPolicy
     {
         return $review->appointment->patient->user_id === Auth::user()->id;
     }
-
     
 }

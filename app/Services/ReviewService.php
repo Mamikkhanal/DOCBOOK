@@ -43,6 +43,15 @@ class ReviewService
             );
         }
 
+        if($review->appointment->status != 'completed') {
+
+            return response()->json(
+                [
+                    'success' => false,
+                    'message' => 'You can only create a review for a completed appointment.'
+                ],400
+            );
+        }
         $existingReview = $this->reviewRepository->findByAppointmentId($data['appointment_id']);
 
         if ($existingReview) {
@@ -55,6 +64,7 @@ class ReviewService
                 400
             );
         }
+
 
         $this->reviewRepository->createReview($data);
         return response ()->json(

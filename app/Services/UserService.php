@@ -91,8 +91,8 @@ class UserService
             $user = User::find($id);
             $user->name = $request['name'];
             $user->email =  $request['email'];
-            $user->password =  $request['password'];
-            $user->phone =  $request['phone'];
+            // $user->password =  $request['password'];
+            // $user->phone =  $request['phone'];
             $user->role = 'admin';
             $user->update();
             return $user;

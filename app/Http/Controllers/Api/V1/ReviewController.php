@@ -102,14 +102,7 @@ class ReviewController extends Controller
             );
         }
 
-        return response()->json(
-            [
-                'status' => true,
-                'message' => 'Review fetched successfully',
-                'data' => $result
-            ],
-            200
-        );
+        return $result;
         
     }
 
