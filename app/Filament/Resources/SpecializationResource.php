@@ -17,7 +17,7 @@ class SpecializationResource extends Resource
 {
     protected static ?string $model = Specialization::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-s-academic-cap';
 
     protected static ?int $navigationSort = 5;
 
@@ -26,8 +26,6 @@ class SpecializationResource extends Resource
         return $form
             ->schema([
                 Forms\Components\TextInput::make('name')
-                    ->required(),
-                Forms\Components\TextInput::make('slug')
                     ->required(),
             ]);
     }

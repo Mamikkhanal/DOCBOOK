@@ -2,9 +2,11 @@
 
 namespace App\Policies;
 
-use App\Models\Patient;
 use App\Models\User;
+use App\Models\Patient;
 use Illuminate\Auth\Access\Response;
+use Illuminate\Support\Facades\Auth;
+
 
 class PatientPolicy
 {
@@ -13,6 +15,10 @@ class PatientPolicy
      */
     public function viewAny(User $user): bool
     {
+        if($user->role == 'patient') {
+            
+            return true;
+        }
         return false;
     }
 
@@ -21,6 +27,10 @@ class PatientPolicy
      */
     public function view(User $user, Patient $patient): bool
     {
+        if($user->role == 'patient' || Auth::user()->id == $patient->user_id) {
+            
+            return true;
+        }
         return false;
     }
 
@@ -37,6 +47,10 @@ class PatientPolicy
      */
     public function update(User $user, Patient $patient): bool
     {
+        if($user->role == 'patient' || Auth::user()->id == $patient->user_id) {
+            
+            return true;
+        }
         return false;
     }
 
@@ -45,6 +59,10 @@ class PatientPolicy
      */
     public function delete(User $user, Patient $patient): bool
     {
+        if($user->role == 'patient' || Auth::user()->id == $patient->user_id) {
+            
+            return true;
+        }
         return false;
     }
 
@@ -53,7 +71,7 @@ class PatientPolicy
      */
     public function restore(User $user, Patient $patient): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -61,6 +79,6 @@ class PatientPolicy
      */
     public function forceDelete(User $user, Patient $patient): bool
     {
-        return false;
+        return true;
     }
 }

@@ -17,7 +17,7 @@ class ServiceResource extends Resource
 {
     protected static ?string $model = Service::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-s-shield-check';
 
     protected static ?int $navigationSort = 4;
 
@@ -27,18 +27,25 @@ class ServiceResource extends Resource
         return $form
             ->schema([
                 Forms\Components\TextInput::make('name')
-                    ->required(),
-                Forms\Components\TextInput::make('slug')
-                    ->required(),
+                ->required()
+                ->reactive()
+                ->afterStateUpdated(fn ($state, callable $set) => 
+                    $set('slug', strtolower(str_replace(' ', '-', $state)))
+                ),
                 Forms\Components\TextInput::make('description')
                     ->required(),
-                Forms\Components\TextInput::make('category'),
+                Forms\Components\Select::make('category')
+                    ->options([
+                    'a' => 'A',
+                    'b' => 'B',
+                    ]),
                 Forms\Components\TextInput::make('price')
                     ->required()
                     ->numeric()
                     ->prefix('$'),
                 Forms\Components\Toggle::make('is_available')
-                    ->required(),
+                    ->required()
+                    ->default(true),
             ]);
     }
 

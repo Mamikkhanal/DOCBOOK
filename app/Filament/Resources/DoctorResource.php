@@ -2,24 +2,31 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\DoctorResource\Pages;
-use App\Filament\Resources\DoctorResource\RelationManagers;
-use App\Models\Doctor;
 use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
 use Filament\Tables;
+use App\Models\Doctor;
+use Filament\Forms\Form;
 use Filament\Tables\Table;
+use App\Models\Specialization;
+use Filament\Resources\Resource;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Builder;
+use App\Filament\Resources\DoctorResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Filament\Resources\DoctorResource\RelationManagers;
 
 class DoctorResource extends Resource
 {
     protected static ?string $model = Doctor::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-s-user';
 
     protected static ?int $navigationSort = 8;
+
+    protected static ?string $navigationGroup = 'Profiles';
+
+    
+    protected static ?string $navigationGroupIcon = 'heroicon-s-user';
 
     public static function form(Form $form): Form
     {
@@ -27,10 +34,23 @@ class DoctorResource extends Resource
             ->schema([
                 Forms\Components\TextInput::make('user_id')
                     ->required()
-                    ->numeric(),
-                Forms\Components\TextInput::make('specialization')
-                    ->required(),
-                Forms\Components\Toggle::make('is_available')
+                    ->numeric()
+                    ->disabled(true),
+                    Forms\Components\Select::make('specialization')
+                    ->label('Specialization')
+                    ->options(
+                        Specialization::pluck('name', 'name') // Assuming you have a Specialization model with 'name' and 'id' columns
+                    )
+                    ->required()
+                    ->reactive()
+                    ->afterStateUpdated(function ($state, callable $set) {
+                        // Validate that the selected specialization is available in the database
+                        $availableSpecializations = Specialization::pluck('name')->toArray();
+                        if (!in_array($state, $availableSpecializations)) {
+                            // You can add custom validation logic here, if needed
+                            $set('specialization', null); // Clear the value if invalid
+                        }
+                    })
                     ->required(),
             ]);
     }
@@ -55,6 +75,7 @@ class DoctorResource extends Resource
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
+            ->modifyQueryUsing(fn (Builder $query): Builder => $query->where('user_id', Auth::user()?->id))
             ->filters([
                 //
             ])
@@ -83,6 +104,9 @@ class DoctorResource extends Resource
             'create' => Pages\CreateDoctor::route('/create'),
             'view' => Pages\ViewDoctor::route('/{record}'),
             'edit' => Pages\EditDoctor::route('/{record}/edit'),
+
+            // The bulk actions that are available for the table
         ];
+                // The 'delete' bulk action will delete all selected doctors
     }
 }

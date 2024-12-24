@@ -13,6 +13,10 @@ class SpecializationPolicy
      */
     public function viewAny(User $user): bool
     {
+        if($user->role == 'admin') {
+            
+            return true;
+        }
         return false;
     }
 
@@ -21,7 +25,7 @@ class SpecializationPolicy
      */
     public function view(User $user, Specialization $specialization): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -29,7 +33,7 @@ class SpecializationPolicy
      */
     public function create(User $user): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -37,7 +41,7 @@ class SpecializationPolicy
      */
     public function update(User $user, Specialization $specialization): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -45,7 +49,7 @@ class SpecializationPolicy
      */
     public function delete(User $user, Specialization $specialization): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -53,7 +57,7 @@ class SpecializationPolicy
      */
     public function restore(User $user, Specialization $specialization): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -61,6 +65,6 @@ class SpecializationPolicy
      */
     public function forceDelete(User $user, Specialization $specialization): bool
     {
-        return false;
+        return true;
     }
 }

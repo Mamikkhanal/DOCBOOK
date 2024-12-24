@@ -15,8 +15,6 @@ return new class extends Migration
             $table->id();
             $table->foreignId('schedule_id')->references('id')->on('schedules')
             ->onDelete('cascade');
-            $table->foreignId('appointment_id')->references('id')->on('appointments')
-            ->onDelete('cascade');
             $table->boolean('is_booked')->default(false);
             $table->date('date');
             $table->time('start_time');

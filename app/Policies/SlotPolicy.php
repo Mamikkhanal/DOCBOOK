@@ -13,6 +13,10 @@ class SlotPolicy
      */
     public function viewAny(User $user): bool
     {
+        if($user->role == 'admin' || $user->role == 'doctor') {
+            
+            return true;
+        }
         return false;
     }
 
@@ -21,7 +25,7 @@ class SlotPolicy
      */
     public function view(User $user, Slot $slot): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -53,7 +57,7 @@ class SlotPolicy
      */
     public function restore(User $user, Slot $slot): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -61,6 +65,6 @@ class SlotPolicy
      */
     public function forceDelete(User $user, Slot $slot): bool
     {
-        return false;
+        return true;
     }
 }

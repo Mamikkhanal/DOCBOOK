@@ -2,22 +2,23 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\ScheduleResource\Pages;
-use App\Filament\Resources\ScheduleResource\RelationManagers;
-use App\Models\Schedule;
 use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
 use Filament\Tables;
+use App\Models\Schedule;
+use Filament\Forms\Form;
 use Filament\Tables\Table;
+use Filament\Resources\Resource;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Builder;
+use App\Filament\Resources\ScheduleResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Filament\Resources\ScheduleResource\RelationManagers;
 
 class ScheduleResource extends Resource
 {
     protected static ?string $model = Schedule::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-s-calendar-date-range';
 
     protected static ?int $navigationSort = 2;
 
@@ -25,15 +26,20 @@ class ScheduleResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('doctor_id')
+                Forms\Components\Hidden::make('doctor_id')
                     ->required()
-                    ->numeric(),
+                    ->default(fn() => Auth::user()?->doctor?->id),
                 Forms\Components\DatePicker::make('date')
-                    ->required(),
-                Forms\Components\TextInput::make('start_time')
-                    ->required(),
-                Forms\Components\TextInput::make('end_time')
-                    ->required(),
+                    ->required()
+                    ->minDate(today()),
+                Forms\Components\TimePicker::make('start_time')
+                    ->required()
+                    ->afterOrEqual(fn(callable $get) => $get('date') == now()->toDateString() ? now()->format('H:i') : null)
+                    ->seconds(false),
+                Forms\Components\TimePicker::make('end_time')
+                    ->required()
+                    ->after('start_time')
+                    ->seconds(false),
             ]);
     }
 
@@ -43,12 +49,15 @@ class ScheduleResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('doctor_id')
                     ->numeric()
+                    // ->hidden(fn($record): bool => $record->doctor_id !== Auth::user()?->doctor?->id)
                     ->sortable(),
                 Tables\Columns\TextColumn::make('date')
                     ->date()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('start_time'),
-                Tables\Columns\TextColumn::make('end_time'),
+                Tables\Columns\TextColumn::make('start_time')
+                ->time(),
+                Tables\Columns\TextColumn::make('end_time')
+                ->time(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -57,13 +66,18 @@ class ScheduleResource extends Resource
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
+
             ])
+            ->modifyQueryUsing(
+                fn(Builder $query): Builder => $query->where('doctor_id', Auth::user()?->doctor?->id)
+            )
             ->filters([
                 //
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

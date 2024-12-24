@@ -52,4 +52,30 @@ class User extends Authenticatable
     {
         return $this->hasOne(Patient::class);
     }
+
+    public function payments()
+    {
+        return $this->hasMany(Payment::class);
+    }
+
+    /**
+     * Scope a query to include only users created in the current week.
+     */
+    public function scopeCreatedCurrentWeek($query)
+    {
+        return $query->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()]);
+    }
+
+    /**
+     * Scope a query to include only users created in the past week.
+     */
+    public function scopeCreatedPastWeek($query)
+    {
+        return $query->whereBetween('created_at', [now()->subWeek()->startOfWeek(), now()->subWeek()->endOfWeek()]);
+    }
+
+    public function hasRole($role): bool
+    {
+        return $this->role === $role;
+    }
 }

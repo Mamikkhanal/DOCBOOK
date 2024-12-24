@@ -13,7 +13,10 @@ class PaymentPolicy
      */
     public function viewAny(User $user): bool
     {
-        return false;
+        if($user->role == 'doctor') {
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -21,6 +24,9 @@ class PaymentPolicy
      */
     public function view(User $user, Payment $payment): bool
     {
+        if($payment->user_id != $user->id) {
+            return true;
+        }
         return false;
     }
 
@@ -29,7 +35,7 @@ class PaymentPolicy
      */
     public function create(User $user): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -53,7 +59,7 @@ class PaymentPolicy
      */
     public function restore(User $user, Payment $payment): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -61,6 +67,6 @@ class PaymentPolicy
      */
     public function forceDelete(User $user, Payment $payment): bool
     {
-        return false;
+        return true;
     }
 }

@@ -13,6 +13,10 @@ class ServicePolicy
      */
     public function viewAny(User $user): bool
     {
+        if($user->role == 'admin') {
+            
+            return true;
+        }
         return false;
     }
 
@@ -21,7 +25,7 @@ class ServicePolicy
      */
     public function view(User $user, Service $service): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -29,7 +33,7 @@ class ServicePolicy
      */
     public function create(User $user): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -37,7 +41,7 @@ class ServicePolicy
      */
     public function update(User $user, Service $service): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -45,7 +49,7 @@ class ServicePolicy
      */
     public function delete(User $user, Service $service): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -53,7 +57,7 @@ class ServicePolicy
      */
     public function restore(User $user, Service $service): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -61,6 +65,6 @@ class ServicePolicy
      */
     public function forceDelete(User $user, Service $service): bool
     {
-        return false;
+        return true;
     }
 }

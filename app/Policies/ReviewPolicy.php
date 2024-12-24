@@ -13,7 +13,7 @@ class ReviewPolicy
      */
     public function viewAny(User $user): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -21,6 +21,9 @@ class ReviewPolicy
      */
     public function view(User $user, Review $review): bool
     {
+        if($review->appointment->patient->user->id == $user->id || $review->appointment->doctor->user->id == $user->id) {
+            return true;
+        }
         return false;
     }
 
@@ -29,6 +32,9 @@ class ReviewPolicy
      */
     public function create(User $user): bool
     {
+        if($user->role == 'patient') {
+            return true;
+        }
         return false;
     }
 
@@ -37,6 +43,9 @@ class ReviewPolicy
      */
     public function update(User $user, Review $review): bool
     {
+        if($review->appointment->patient->user->id == $user->id) {
+            return true;
+        }
         return false;
     }
 
@@ -45,6 +54,9 @@ class ReviewPolicy
      */
     public function delete(User $user, Review $review): bool
     {
+        if($review->appointment->patient->user->id == $user->id) {
+            return true;
+        }
         return false;
     }
 
@@ -53,7 +65,7 @@ class ReviewPolicy
      */
     public function restore(User $user, Review $review): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -61,6 +73,6 @@ class ReviewPolicy
      */
     public function forceDelete(User $user, Review $review): bool
     {
-        return false;
+        return true;
     }
 }

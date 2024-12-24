@@ -2,22 +2,23 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\PaymentResource\Pages;
-use App\Filament\Resources\PaymentResource\RelationManagers;
-use App\Models\Payment;
 use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
 use Filament\Tables;
+use App\Models\Payment;
+use Filament\Forms\Form;
 use Filament\Tables\Table;
+use Filament\Resources\Resource;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Builder;
+use App\Filament\Resources\PaymentResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Filament\Resources\PaymentResource\RelationManagers;
 
 class PaymentResource extends Resource
 {
     protected static ?string $model = Payment::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-s-credit-card';
 
     protected static ?int $navigationSort = 7;
 
@@ -25,21 +26,21 @@ class PaymentResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('user_id')
-                    ->required()
-                    ->numeric(),
-                Forms\Components\TextInput::make('appointment_id')
-                    ->required()
-                    ->numeric(),
-                Forms\Components\TextInput::make('service_id')
-                    ->required()
-                    ->numeric(),
-                Forms\Components\TextInput::make('pid'),
-                Forms\Components\TextInput::make('amount')
-                    ->required()
-                    ->numeric(),
-                Forms\Components\TextInput::make('status')
-                    ->required(),
+                // Forms\Components\Hidden::make('user_id')
+                //     ->required()
+                //     ->numeric(),
+                // Forms\Components\Hidden::make('appointment_id')
+                //     ->required()
+                //     ->numeric(),
+                // Forms\Components\Hidden::make('service_id')
+                //     ->required()
+                //     ->numeric(),
+                // Forms\Components\Hidden::make('pid'),
+                // Forms\Components\Hidden::make('amount')
+                //     ->required()
+                //     ->numeric(),
+                // Forms\Components\Hidden::make('status')
+                //     ->required(),
             ]);
     }
 
@@ -58,7 +59,7 @@ class PaymentResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('pid')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('amount')
+                Tables\Columns\TextColumn::make('amount') 
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('status')
@@ -72,6 +73,21 @@ class PaymentResource extends Resource
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
+            ->modifyQueryUsing(function (Builder $query): Builder {
+                $user = Auth::user();
+            
+                if ($user->role === 'admin') {
+                    return $query;
+                }
+            
+                if ($user->role === 'patient') {
+                    return $query->where('user_id', $user->id);
+                }
+            
+                // Default case: restrict query if no role matches
+                return $query->whereNull('id'); // Return no results
+            })
+            
             ->filters([
                 //
             ])

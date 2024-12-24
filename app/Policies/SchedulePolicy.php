@@ -13,6 +13,9 @@ class SchedulePolicy
      */
     public function viewAny(User $user): bool
     {
+        if($user->role == 'doctor') {  
+            return true;
+        }
         return false;
     }
 
@@ -21,6 +24,9 @@ class SchedulePolicy
      */
     public function view(User $user, Schedule $schedule): bool
     {
+        if($user->role == 'doctor' && $schedule->doctor_id == $user->doctor->id) {
+        return true;
+        }
         return false;
     }
 
@@ -29,6 +35,9 @@ class SchedulePolicy
      */
     public function create(User $user): bool
     {
+        if($user->role == 'doctor') {  
+            return true;
+        }
         return false;
     }
 
@@ -37,6 +46,10 @@ class SchedulePolicy
      */
     public function update(User $user, Schedule $schedule): bool
     {
+
+        if($user->role == 'doctor' && $schedule->doctor_id == $user->doctor->id) {
+        return true;
+        }
         return false;
     }
 
@@ -45,6 +58,9 @@ class SchedulePolicy
      */
     public function delete(User $user, Schedule $schedule): bool
     {
+        if($user->role == 'doctor' && $schedule->doctor_id == $user->doctor->id) {
+            return true;
+            }
         return false;
     }
 
@@ -53,7 +69,7 @@ class SchedulePolicy
      */
     public function restore(User $user, Schedule $schedule): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -61,6 +77,6 @@ class SchedulePolicy
      */
     public function forceDelete(User $user, Schedule $schedule): bool
     {
-        return false;
+        return true;
     }
 }

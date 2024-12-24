@@ -19,6 +19,12 @@ class Schedule extends Model
         return $this->belongsTo(Doctor::class);
     }
 
+    public function appointment()
+    {
+        return $this->belongsTo(Appointment::class);
+    }
+
+
     public function slots(){
         return $this->hasMany(Slot::class);
     }

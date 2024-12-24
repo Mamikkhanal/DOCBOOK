@@ -16,11 +16,11 @@ return new class extends Migration
             $table->foreignId('patient_id')->references('id')->on('patients');
             $table->foreignId('doctor_id')->references('id')->on('doctors');
             $table->foreignId('service_id')->references('id')->on('services');
-            $table->date('date');
-            $table->time('start_time');
-            $table->time('end_time');
+            $table->foreignId('schedule_id')->references('id')->on('schedules');
+            $table->foreignId('slot_id')->references('id')->on('slots');
             $table->enum('status', ['pending','booked', 'cancelled', 'completed','rescheduled'])->default('pending');
             $table->longText("description");
+            $table->string('prescription')->nullable();
             $table->timestamps();
         });
     }

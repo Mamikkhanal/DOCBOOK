@@ -26,6 +26,10 @@ class Appointment extends Model
         return $this->belongsTo(Service::class);
     }
 
+    public function schedule(){
+        return $this->hasOne(Schedule::class);
+    }
+
     public function slot(){
         return $this->hasOne(Slot::class);
     }

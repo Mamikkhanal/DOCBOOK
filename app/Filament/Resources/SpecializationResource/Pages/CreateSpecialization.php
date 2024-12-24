@@ -9,4 +9,10 @@ use Filament\Resources\Pages\CreateRecord;
 class CreateSpecialization extends CreateRecord
 {
     protected static string $resource = SpecializationResource::class;
+
+    protected function mutateFormDataBeforeCreate(array $data): array
+    {
+        $data['slug'] = strtolower($data['name']);
+        return $data;
+    }
 }

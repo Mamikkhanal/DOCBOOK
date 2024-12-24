@@ -2,22 +2,26 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\SlotResource\Pages;
-use App\Filament\Resources\SlotResource\RelationManagers;
-use App\Models\Slot;
 use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
+use App\Models\Slot;
 use Filament\Tables;
+use App\Models\Schedule;
+use Filament\Forms\Form;
 use Filament\Tables\Table;
+use Filament\Resources\Resource;
+use Filament\Tables\Actions\Action;
+use Illuminate\Support\Facades\Auth;
+use Filament\Notifications\Notification;
 use Illuminate\Database\Eloquent\Builder;
+use App\Filament\Resources\SlotResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Filament\Resources\SlotResource\RelationManagers;
 
 class SlotResource extends Resource
 {
     protected static ?string $model = Slot::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-s-clock';
 
     protected static ?int $navigationSort = 6;
 
@@ -53,12 +57,18 @@ class SlotResource extends Resource
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\IconColumn::make('is_booked')
-                    ->boolean(),
+                    ->boolean()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('date')
                     ->date()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('start_time'),
-                Tables\Columns\TextColumn::make('end_time'),
+                Tables\Columns\TextColumn::make('start_time')
+                    ->sortable()
+                    ->time(),
+                Tables\Columns\TextColumn::make('end_time')
+                    ->sortable()
+                    ->time()
+                    ->toggleable(isToggledHiddenByDefault: true),          
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -68,12 +78,62 @@ class SlotResource extends Resource
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
+            ->modifyQueryUsing(function (Builder $query): Builder {
+                $user = Auth::user();
+            
+                if ($user->role=='doctor') {
+                    // Filter for doctors
+                    return $query->where('schedule_id', Schedule::where('doctor_id', $user->doctor->id)->value('id'));
+                }
+            
+                if ($user->role=='admin') {
+                    // Admin sees all records
+                    return $query;
+                }
+            
+                // Default: No records for unauthorized users
+                return $query->whereRaw('0 = 1');
+            })
+
             ->filters([
                 //
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
+                Action::make('Book')
+                    ->label('Book')
+                    ->action(function ($record) {
+                        $record->update([
+                            'is_booked' => true,
+                        ]);
+
+                        Notification::make()
+                            ->title('Slot Booked!')
+                            ->success()
+                            ->send();
+                    })
+                    ->requiresConfirmation()
+                    ->color('success')
+                    ->icon('heroicon-s-check-badge')
+                    ->visible(fn($record) => !$record->is_booked && Auth::user()->role === 'doctor'),
+
+                Action::make('Unbook')
+                    ->label('Unbook')
+                    ->action(function ($record) {
+                        $record->update([
+                            'is_booked' => false,
+                        ]);
+
+                        Notification::make()
+                            ->title('Slot Unbooked!')
+                            ->success()
+                            ->send();
+                    })
+                    ->requiresConfirmation()
+                    ->color('danger')
+                    ->icon('heroicon-s-x-circle')
+                    ->visible(fn($record) => $record->is_booked && (Auth::user()->role === 'doctor'|| Auth::user()->role === 'admin')),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

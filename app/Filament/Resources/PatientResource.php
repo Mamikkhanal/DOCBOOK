@@ -2,24 +2,29 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\PatientResource\Pages;
-use App\Filament\Resources\PatientResource\RelationManagers;
-use App\Models\Patient;
 use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
 use Filament\Tables;
+use App\Models\Patient;
+use Filament\Forms\Form;
 use Filament\Tables\Table;
+use Filament\Resources\Resource;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Builder;
+use App\Filament\Resources\PatientResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Filament\Resources\PatientResource\RelationManagers;
 
 class PatientResource extends Resource
 {
     protected static ?string $model = Patient::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-s-user';
 
     protected static ?int $navigationSort = 9;
+
+    protected static ?string $navigationGroup = 'Profiles';
+
+    protected static ?string $NavigationGroupIcon = "heroicon-s-user";
 
     public static function form(Form $form): Form
     {
@@ -27,7 +32,8 @@ class PatientResource extends Resource
             ->schema([
                 Forms\Components\TextInput::make('user_id')
                     ->required()
-                    ->numeric(),
+                    ->numeric()
+                    ->disabled(true),
                 Forms\Components\TextInput::make('age')
                     ->required()
                     ->numeric(),
@@ -53,6 +59,7 @@ class PatientResource extends Resource
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
+            ->modifyQueryUsing(fn (Builder $query): Builder => $query->where('user_id', Auth::user()?->id))
             ->filters([
                 //
             ])

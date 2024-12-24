@@ -4,7 +4,7 @@ namespace App\Policies;
 
 use App\Models\Appointment;
 use App\Models\User;
-use Illuminate\Auth\Access\Response;
+use Illuminate\support\Facades\Auth;
 
 class AppointmentPolicy
 {
@@ -13,7 +13,7 @@ class AppointmentPolicy
      */
     public function viewAny(User $user): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -21,7 +21,14 @@ class AppointmentPolicy
      */
     public function view(User $user, Appointment $appointment): bool
     {
-        return false;
+        if($appointment->patient->user->id === Auth::user()->id || $appointment->doctor->user->id === Auth::user()->id || Auth::user()->role === 'admin') {
+            
+            return true;
+        }
+        else{
+
+            return false;
+        }
     }
 
     /**
@@ -29,7 +36,12 @@ class AppointmentPolicy
      */
     public function create(User $user): bool
     {
-        return false;
+        if(Auth::user()->role === 'patient' || Auth::user()->role === 'admin') {
+            return true;
+        }
+        else{
+            return false;
+        }
     }
 
     /**
@@ -37,7 +49,14 @@ class AppointmentPolicy
      */
     public function update(User $user, Appointment $appointment): bool
     {
-        return false;
+        if($appointment->doctor->user->id === Auth::user()->id || Auth::user()->role === 'admin') {
+            
+            return true;
+        }
+        else{
+
+            return false;
+        }
     }
 
     /**
@@ -45,7 +64,18 @@ class AppointmentPolicy
      */
     public function delete(User $user, Appointment $appointment): bool
     {
-        return false;
+        if($appointment->doctor->user->id === Auth::user()->id || Auth::user()->role === 'admin') {
+            if($appointment->status === 'pending') { 
+                return true;
+            }
+            else{
+                return false;
+            }
+        }
+        else{
+
+            return false;
+        }
     }
 
     /**
@@ -53,7 +83,7 @@ class AppointmentPolicy
      */
     public function restore(User $user, Appointment $appointment): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -61,6 +91,6 @@ class AppointmentPolicy
      */
     public function forceDelete(User $user, Appointment $appointment): bool
     {
-        return false;
+        return true;
     }
 }
