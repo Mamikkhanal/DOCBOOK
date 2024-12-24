@@ -16,6 +16,7 @@ use App\Models\Schedule;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
 use App\Models\Appointment;
+use Faker\Provider\ar_EG\Text;
 use Filament\Facades\Filament;
 use PhpParser\Node\Stmt\Label;
 use Filament\Infolists\Infolist;
@@ -31,14 +32,14 @@ use Filament\Forms\Components\FileUpload;
 use Filament\Tables\Columns\Layout\Split;
 use Filament\Tables\Columns\Layout\Stack;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
-use App\Filament\Resources\AppointmentResource\Pages;
-use App\Filament\Resources\AppointmentResource\RelationManagers;
-use Faker\Provider\ar_EG\Text;
-use Filament\Infolists\Components\ImageEntry;
 use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\TextEntry;
 use Illuminate\Console\View\Components\Info;
+use Filament\Infolists\Components\ImageEntry;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Filament\Resources\AppointmentResource\Pages;
+use App\Filament\Resources\PaymentResource\Pages\StripePayment;
+use App\Filament\Resources\AppointmentResource\RelationManagers;
 
 class AppointmentResource extends Resource
 {
@@ -318,6 +319,17 @@ class AppointmentResource extends Resource
                         ->icon('heroicon-s-credit-card')
                         ->visible(fn($record) => $record->status === 'booked' || ($record->status === 'booked' && $record->payment->status === 'unpaid')),
 
+                        Action::make('SPayment')
+                        ->label('Pay via Stripe')
+                        ->action(function ($record) {
+                            // $url = url('docbook/appointments/stripe-payment/{record}', ['id'=> $record->payment->id]);
+                            // return $url;
+                            return redirect(route('filament.admin.resources.appointments.stripePayment', ['record' => $record->id]));
+                        })
+                        ->color('success')
+                        ->icon('heroicon-s-credit-card')
+                        ->visible(fn($record) => $record->status === 'booked' || ($record->status === 'booked' && $record->payment->status === 'unpaid')),
+
                     Action::make('Give_Review')
                         ->label('Give a Review')
                         ->action(function ($record) {
@@ -500,6 +512,8 @@ class AppointmentResource extends Resource
             'create' => Pages\CreateAppointment::route('/create'),
             'view' => Pages\ViewAppointment::route('/{record}'),
             'edit' => Pages\EditAppointment::route('/{record}/edit'),
+            'stripePayment' => StripePayment::route('/stripe-payment/{record}'),
+
         ];
     }
 }

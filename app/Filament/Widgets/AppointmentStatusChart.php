@@ -11,6 +11,8 @@ class AppointmentStatusChart extends ChartWidget
     protected static ?int $sort = 3;
     protected static ?string $heading = 'Appointment Status';
 
+    protected static ?string $maxHeight = '180px';
+
 //     public static function canView(): bool
 // {
 //     return Auth::user()->role === 'admin';

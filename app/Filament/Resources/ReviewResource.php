@@ -64,7 +64,7 @@ class ReviewResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('appointment_id')
-                ->label('Appointment ID')
+                ->label('Appointment')
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('review')

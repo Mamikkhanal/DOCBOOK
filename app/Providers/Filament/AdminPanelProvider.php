@@ -36,11 +36,11 @@ class AdminPanelProvider extends PanelProvider
             ->registration(Register::class)
             ->colors([
                 'danger' => Color::Rose,
-                // 'gray'=> Color::Gray,
-                'gray' => '#1e3a8a',
+                'gray'=> Color::Gray,
+                // 'gray' => '#1e3a8a',
                 'info' => Color::Indigo,
-                // 'primary' => Color::Blue,
-                'primary' => '#7f1d1d',
+                'primary' => Color::Blue,
+                // 'primary' => '#7f1d1d',
                 'success' => Color::Emerald,
                 'warning' => Color::Orange,
                 'action_btn'=> '#1e3a8a',
