@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use Carbon\Carbon;
 use Filament\Forms;
 use App\Models\Slot;
 use Filament\Tables;
@@ -10,8 +11,10 @@ use Filament\Forms\Form;
 use Filament\Tables\Table;
 use Filament\Resources\Resource;
 use Filament\Tables\Actions\Action;
+use Filament\Tables\Filters\Filter;
 use Illuminate\Support\Facades\Auth;
 use Filament\Notifications\Notification;
+use Filament\Forms\Components\DatePicker;
 use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Resources\SlotResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -51,24 +54,28 @@ class SlotResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('schedule_id')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('appointment_id')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\IconColumn::make('is_booked')
-                    ->boolean()
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+
                 Tables\Columns\TextColumn::make('date')
                     ->date()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('start_time')
                     ->sortable()
-                    ->time(),
+                    ->time()
+                    ->formatStateUsing(function ($state) {
+                        return Carbon::parse($state)->format('H:i');
+                    }),
                 Tables\Columns\TextColumn::make('end_time')
                     ->sortable()
                     ->time()
-                    ->toggleable(isToggledHiddenByDefault: true),          
+                    ->formatStateUsing(function ($state) {
+                        return Carbon::parse($state)->format('H:i');
+                    })
+                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\IconColumn::make('is_booked')
+                    ->boolean()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -80,24 +87,37 @@ class SlotResource extends Resource
             ])
             ->modifyQueryUsing(function (Builder $query): Builder {
                 $user = Auth::user();
-            
-                if ($user->role=='doctor') {
-                    // Filter for doctors
-                    return $query->where('schedule_id', Schedule::where('doctor_id', $user->doctor->id)->value('id'));
+
+                if ($user->role == 'doctor') {
+                    return $query->whereHas('schedule', function ($subQuery) use ($user) {
+                        $subQuery->where('doctor_id', $user->doctor->id);
+                    });
                 }
-            
-                if ($user->role=='admin') {
+
+                if ($user->role == 'admin') {
                     // Admin sees all records
                     return $query;
                 }
-            
+
                 // Default: No records for unauthorized users
                 return $query->whereRaw('0 = 1');
             })
 
             ->filters([
-                //
+                Filter::make('date')
+                    ->form([
+                        DatePicker::make('date')
+                            ->default(null),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        if(!isset($data['date'])) {
+                            return $query;
+                        }
+                        return $query
+                            ->whereDate('date', '=', $data['date']);
+                    })
             ])
+
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
@@ -133,14 +153,16 @@ class SlotResource extends Resource
                     ->requiresConfirmation()
                     ->color('danger')
                     ->icon('heroicon-s-x-circle')
-                    ->visible(fn($record) => $record->is_booked && (Auth::user()->role === 'doctor'|| Auth::user()->role === 'admin')),
+                    ->visible(fn($record) => $record->is_booked && (Auth::user()->role === 'doctor' || Auth::user()->role === 'admin')),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make()
+                        ->visible(fn(): bool => Auth::user()->role === 'admin'),
                 ]),
             ]);
     }
+
 
     public static function getRelations(): array
     {

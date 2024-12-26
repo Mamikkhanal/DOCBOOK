@@ -35,6 +35,9 @@ class PaymentPolicy
      */
     public function create(User $user): bool
     {
+        if(!request()->query('appointment_id')) {
+            return false;
+        }
         return true;
     }
 

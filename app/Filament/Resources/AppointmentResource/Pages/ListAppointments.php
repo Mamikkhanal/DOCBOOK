@@ -2,13 +2,16 @@
 
 namespace App\Filament\Resources\AppointmentResource\Pages;
 
+use Carbon\Carbon;
 use Filament\Actions;
+use App\Models\Schedule;
 use App\Models\Appointment;
+use Illuminate\Support\Facades\Auth;
 use Filament\Resources\Components\Tab;
 use Filament\Resources\Pages\ListRecords;
 use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Resources\AppointmentResource;
-use Illuminate\Support\Facades\Auth;
+
 class ListAppointments extends ListRecords
 {
     protected static string $resource = AppointmentResource::class;
@@ -25,6 +28,35 @@ class ListAppointments extends ListRecords
         return [
             Tab::make('All')
                 ->badge(fn() => $this->getCount())
+                ->badgeColor('primary'),
+
+            
+                Tab::make('Upcoming')
+                ->modifyQueryUsing(function (Builder $query) {
+                    $query->whereHas('schedule', function ($scheduleQuery) {
+                        $scheduleQuery->where('date', '>', Carbon::now()->format('Y-m-d'));
+                    });
+                    $count= count($query->get());
+                })
+                
+                ->badge(function() {
+                    return Appointment::whereHas('schedule', function ($scheduleQuery) {
+                        $scheduleQuery->where('date', '>', Carbon::now()->format('Y-m-d'));
+                    })->count();
+                })
+                ->badgeColor('primary'),
+
+            Tab::make('Today')
+                ->modifyQueryUsing(function (Builder $query) {
+                    $query->whereHas('schedule', function ($scheduleQuery) {
+                        $scheduleQuery->where('date', '=', Carbon::now()->format('Y-m-d'));
+                    });
+                })
+                ->badge(function() {
+                    return Appointment::whereHas('schedule', function ($scheduleQuery) {
+                        $scheduleQuery->where('date', '=', Carbon::now()->format('Y-m-d'));
+                    })->count();
+                })
                 ->badgeColor('primary'),
 
             Tab::make('Pending')
@@ -60,23 +92,21 @@ class ListAppointments extends ListRecords
     }
 
     protected function getCount(string $status = null): int
-{
-    $query = Appointment::query();
-
-    if(Auth::user()->role == 'patient') {
-        $query->where('patient_id', Auth::user()->patient->id);
-    }
-    elseif(Auth::user()->role == 'doctor') {
-    $query->where('doctor_id', Auth::user()->doctor->id);
-    }
-    elseif(Auth::user()->role == 'admin') {
+    {
         $query = Appointment::query();
-    }
 
-    if ($status) {
-        $query->where('status', $status);
-    }
+        if (Auth::user()->role == 'patient') {
+            $query->where('patient_id', Auth::user()->patient->id);
+        } elseif (Auth::user()->role == 'doctor') {
+            $query->where('doctor_id', Auth::user()->doctor->id);
+        } elseif (Auth::user()->role == 'admin') {
+            $query = Appointment::query();
+        }
 
-    return $query->count();
-}
+        if ($status) {
+            $query->where('status', $status);
+        }
+
+        return $query->count();
+    }
 }

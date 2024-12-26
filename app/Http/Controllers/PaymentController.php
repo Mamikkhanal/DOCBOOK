@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Payment;
+use App\Models\Appointment;
+use Filament\Notifications\Notification;
 use Illuminate\Http\Request;
 use Xentixar\EsewaSdk\Esewa;
 use Illuminate\Support\Facades\Mail;
@@ -16,11 +18,11 @@ class PaymentController extends Controller
         $esewa = new Esewa();
 
         $pid = "TXN-" . uniqid();
-        
+
         $payment->update([
             'pid' => $pid,
         ]);
-        
+
         $esewa->config(
             route('payment.success'),
             route('payment.failure'),
@@ -39,27 +41,43 @@ class PaymentController extends Controller
         $esewa = new Esewa();
         $response = $esewa->decode();
 
-        if ($response){
+        if ($response) {
 
-            if(isset($response['transaction_uuid'])){
+            if (isset($response['transaction_uuid'])) {
                 $transactionUuid = $response['transaction_uuid'];
 
                 $payment = Payment::where('pid', $transactionUuid)->first();
 
-                if($payment){
+                if ($payment) {
                     $payment->update([
                         'status' => 'paid',
                     ]);
 
+                    $appointment = Appointment::find($payment->appointment_id);
+                    if ($appointment->status == 'pending') {
+                        $appointment->update([
+                            'status' => 'booked',
+                        ]);
+                    }
+
                     Mail::to($payment->appointment->patient->user->email)->send(new \App\Mail\PaymentMail($payment));
 
-                    return response()->json(['success' => true, 'message' => 'Payment successful.'],200);
-                }else{
-                    return response()->json(['success' => false, 'message' => 'Payment not found.'],404);
+                    Notification::make()
+                        ->title('Payment Success')
+                        ->body('Payment successfully done!')
+                        ->success()
+                        ->send();
+                    return redirect()->back()->with('success', 'Payment successfully done!');
+                } else {
+                    Notification::make()
+                        ->title('Payment Failed')
+                        ->body('Payment not found!')
+                        ->success()
+                        ->send();
+                    return redirect()->back()->with('error', 'Payment not found!');
                 }
-
             }
-        return response ()->json(['success' => false, 'message' => 'Invalid response from Esewa.'],400);
+            return redirect()->back()->with('error', 'Payment failed!');
         }
     }
 
@@ -69,6 +87,11 @@ class PaymentController extends Controller
      */
     public function failure(Request $request)
     {
-        return response()->json(['success' => false, 'message' => 'Payment failed.'],400);
+        Notification::make()
+            ->title('Payment Failed')
+            ->body('Payment failed!')
+            ->danger()
+            ->send();
+        return response()->json(['success' => false, 'message' => 'Payment failed.'], 400);
     }
 }

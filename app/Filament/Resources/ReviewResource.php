@@ -51,11 +51,12 @@ class ReviewResource extends Resource
                     ->label('Review')
                     ->default('Good service. I will recommend to others.'),
 
-                Forms\Components\Textarea::make('message')
-                    ->columnSpanFull()
-                    ->disabled( fn () => !request()->query('appointment_id'))
-                    ->visible(fn () => !request()->query('appointment_id'))
-                    ->default('You must visit through the appointment to create review'),
+                // Forms\Components\Textarea::make('message')
+                //     ->columnSpanFull()
+                //     ->disabled()
+                //     ->hidden( fn()=> request()->query('appointment_id') || fn() => request()->query('review_id'))
+                //     ->visible( fn () => !request()->query('appointment_id'))
+                //     ->default('You must visit through the appointment to create review'),
             ]);
     }
 
@@ -65,8 +66,9 @@ class ReviewResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('appointment_id')
                 ->label('Appointment')
-                    ->numeric()
-                    ->sortable(),
+                    ->getStateUsing(function ($record) {
+                        return $record->appointment->patient->user->name .' '. ' '.'to'.' '.' '. $record->appointment->doctor->user->name;
+                    }),
                 Tables\Columns\TextColumn::make('review')
                 ->label('Review'),
                 Tables\Columns\TextColumn::make('created_at')
@@ -115,7 +117,8 @@ class ReviewResource extends Resource
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make()
+                    ->visible(fn(): bool => Auth::user()->role === 'admin'),
                 ]),
             ]);
     }

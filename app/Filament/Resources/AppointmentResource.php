@@ -21,18 +21,22 @@ use Filament\Facades\Filament;
 use PhpParser\Node\Stmt\Label;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
+use Filament\Forms\Components\Grid;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Columns\Column;
+use Filament\Tables\Filters\Filter;
+use Filament\Forms\Components\Split;
 use Illuminate\Support\Facades\Auth;
+use Filament\Forms\Components\Section;
 use Filament\Support\Enums\ActionSize;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Notifications\Notification;
 use Filament\Tables\Columns\ImageColumn;
+use Filament\Forms\Components\DatePicker;
+
 use Filament\Forms\Components\FileUpload;
-use Filament\Tables\Columns\Layout\Split;
 use Filament\Tables\Columns\Layout\Stack;
 use Illuminate\Database\Eloquent\Builder;
-use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\TextEntry;
 use Illuminate\Console\View\Components\Info;
 use Filament\Infolists\Components\ImageEntry;
@@ -40,6 +44,7 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\AppointmentResource\Pages;
 use App\Filament\Resources\PaymentResource\Pages\StripePayment;
 use App\Filament\Resources\AppointmentResource\RelationManagers;
+use Filament\Tables\Filters\SelectFilter;
 
 class AppointmentResource extends Resource
 {
@@ -54,116 +59,151 @@ class AppointmentResource extends Resource
         return $form
             ->schema([
 
-                Forms\Components\Select::make('patient_id')
-                    ->required()
-                    ->visible(Auth::user()->role === 'admin')
-                    ->options(function () {
-                        return User::whereHas('patient')->get()
-                            ->mapWithKeys(function ($user) {
-                                $label = $user->name && $user->patient->age
-                                    ? "{$user->name} ----(Age:{$user->patient->age})"
-                                    : null;
+                Split::make([
+                    Section::make([
 
-                                return $label ? [$user->patient->id => $label] : []; // Avoid null labels
+                        Forms\Components\Select::make('patient_id')
+                            ->required()
+                            ->visible(Auth::user()->role === 'admin')
+                            ->options(function () {
+                                return User::whereHas('patient')->get()
+                                    ->mapWithKeys(function ($user) {
+                                        $label = $user->name && $user->patient->age
+                                            ? "{$user->name} ----(Age:{$user->patient->age})"
+                                            : null;
+
+                                        return $label ? [$user->patient->id => $label] : [];
+                                    })
+                                    ->toArray();
                             })
-                            ->toArray();
-                    })
-                    ->label('Select Patient')
-                    ->hiddenOn('edit'),
+                            ->label('Select Patient')
+                            ->hiddenOn('edit'),
 
+                        Forms\Components\Select::make('doctor_id')
+                            ->required()
+                            ->options(function () {
+                                return User::whereHas('doctor')->get()
+                                    ->mapWithKeys(function ($user) {
+                                        $label = $user->name && $user->doctor->specialization
+                                            ? "{$user->name} ({$user->doctor->specialization})"
+                                            : null;
 
-                Forms\Components\Select::make('doctor_id')
-                    ->required()
-                    ->options(function () {
-                        return User::whereHas('doctor')->get()
-                            ->mapWithKeys(function ($user) {
-                                $label = $user->name && $user->doctor->specialization
-                                    ? "{$user->name} ({$user->doctor->specialization})"
-                                    : null;
-
-                                return $label ? [$user->doctor->id => $label] : []; // Avoid null labels
+                                        return $label ? [$user->doctor->id => $label] : [];
+                                    })
+                                    ->toArray();
                             })
-                            ->toArray();
-                    })
-                    ->label('Select Doctor')
-                    ->live(), // Make this field reactive
+                            ->label('Select Doctor')
+                            ->live()
+                            ->reactive(),
 
-                Forms\Components\Select::make('service_id')
-                    ->required()
-                    ->options(function (callable $get) {
-                        return Service::all()->pluck('name', 'id');
-                    })
-                    ->label('Select Service'),
-
-                Forms\Components\Select::make('schedule_id')
-                    ->required()
-                    ->options(function (callable $get) {
-                        $doctorId = $get('doctor_id'); // Get the selected doctor ID
-                        if (!$doctorId) {
-                            return []; // Return an empty array if no doctor is selected
-                        }
-
-                        // Fetch schedules for the selected doctor and format the date
-                        return Schedule::where('doctor_id', $doctorId)
-                            ->whereDate('date', '>=', Carbon::today())
-                            ->get()
-                            ->mapWithKeys(function ($schedule) {
-                                // Format the date as desired (e.g., 'd-m-Y')
-                                $formattedDate = Carbon::parse($schedule->date)->format('d-m-Y');
-                                return [$schedule->id => $formattedDate];
+                        Forms\Components\Select::make('service_id')
+                            ->required()
+                            ->options(function (callable $get) {
+                                return Service::all()->pluck('name', 'id');
                             })
-                            ->toArray();
-                    })
-                    ->live()
-                    ->label('Select Schedule'),
+                            ->label('Select Service'),
 
+                        Forms\Components\Select::make('schedule_id')
+                            ->required()
+                            ->options(function (callable $get) {
+                                $doctorId = $get('doctor_id');
+                                if (!$doctorId) {
+                                    return [];
+                                }
 
+                                return Schedule::where('doctor_id', $doctorId)
+                                    ->whereDate('date', '>=', Carbon::today())
+                                    ->get()
+                                    ->mapWithKeys(function ($schedule) {
+                                        $formattedDate = Carbon::parse($schedule->date)->format('d-m-Y');
+                                        return [$schedule->id => $formattedDate];
+                                    })
+                                    ->toArray();
+                            })
+                            ->live()
+                            ->label('Select Schedule'),
 
-                Forms\Components\Select::make('slot_id')
-                    ->required()
-                    ->options(function (callable $get) {
-                        $scheduleId = $get('schedule_id'); // Get the selected schedule ID
-                        if (!$scheduleId) {
-                            return []; // Return an empty array if no schedule is selected
-                        }
+                        Forms\Components\Select::make('slot_id')
+                            ->required()
+                            ->options(function (callable $get) {
+                                $scheduleId = $get('schedule_id');
+                                if (!$scheduleId) {
+                                    return [];
+                                }
 
-                        // Fetch slots for the selected schedule
-                        return Slot::where('schedule_id', $scheduleId)
-                            ->where('is_booked', false)
-                            ->whereTime('start_time', '>=', Carbon::now()->format('H:i'))
-                            ->get()
-                            ->mapWithKeys(function ($slot) {
+                                return Slot::where('schedule_id', $scheduleId)
+                                    ->where('is_booked', false)
+                                    ->whereTime('start_time', '>=', Carbon::now()->format('H:i'))
+                                    ->get()
+                                    ->mapWithKeys(function ($slot) {
+                                        return [
+                                            $slot->id => Carbon::parse($slot->start_time)->format('H:i'),
+                                        ];
+                                    })
+                                    ->toArray();
+                            })
+                            ->label('Select Slot')
+                            ->hiddenOn('edit'),
+
+                        Forms\Components\Textarea::make('description')
+                            ->required()
+                            ->columnSpanFull()
+                            ->hiddenOn('edit'),
+
+                        Forms\Components\FileUpload::make('prescription')
+                            ->label('Prescription')
+                            ->image()
+                            ->disk('public')
+                            ->required()
+                            ->nullable()
+                            ->previewable(true)
+                            ->visible(Auth::user()->role === 'doctor'),
+
+                        Forms\Components\Select::make('status')
+                            ->options([
+                                'pending' => 'Pending',
+                                'booked' => 'Booked',
+                                'cancelled' => 'Cancelled',
+                                'completed' => 'Completed',
+                            ])
+                            ->visibleOn('edit'),
+                    ]),
+                ]),
+
+                Split::make([
+                    Section::make([
+                        Forms\Components\Placeholder::make('schedules')
+                        ->label('Schedules')
+                        ->content(function ($get) {
+                            $doctorId = $get('doctor_id');
+                            if (!$doctorId) {
+                                return 'No doctor selected.';
+                            }
+    
+                            $schedules = Schedule::where('doctor_id', $doctorId)->get();
+    
+                            if ($schedules->isEmpty()) {
+                                return 'No schedules available for this doctor.';
+                            }
+    
+                            $schedulesData = $schedules->map(function ($schedule) {
                                 return [
-                                    $slot->id => Carbon::parse($slot->start_time)->format('H:i'), // Format the time as 'HH:mm'
+                                    'date' => $schedule->date,
+                                    'start_time' => $schedule->start_time,
+                                    'end_time' => $schedule->end_time,
                                 ];
-                            })
-                            ->toArray();
-                    })
-                    ->label('Select Slot')
-                    ->hiddenOn('edit'),
+                            })->values()->toArray();
+    
+                            return view('filament.forms.list', [
+                                'columns' => ['day', 'time', 'status'],
+                                'rows' => $schedulesData,
+                            ]);
+                        })
+                        ->columnSpanFull(),
+                    ]),
 
-                Forms\Components\Textarea::make('description')
-                    ->required()
-                    ->columnSpanFull()
-                    ->hiddenOn('edit'),
+                ])
 
-                FileUpload::make('prescription')
-                    ->label('Prescription')
-                    ->image()
-                    ->disk('public')
-                    ->required()
-                    ->nullable()
-                    ->previewable(true)
-                    ->visible(Auth::user()->role === 'doctor'),
-
-                Forms\Components\Select::make('status')
-                    ->options([
-                        'pending' => 'Pending',
-                        'booked' => 'Booked',
-                        'cancelled' => 'Cancelled',
-                        'completed' => 'Completed',
-                    ])
-                    ->visibleOn('edit'),
             ]);
     }
 
@@ -202,6 +242,7 @@ class AppointmentResource extends Resource
 
                 Tables\Columns\TextColumn::make('schedule_id')
                     ->label('Date')
+                    ->searchable()
                     ->sortable()
                     ->formatStateUsing(function ($state) {
                         $schedule = Schedule::find($state);
@@ -231,10 +272,10 @@ class AppointmentResource extends Resource
 
 
                 Tables\Columns\TextColumn::make('payment_status')
-                ->label('Fee')
+                    ->label('Fee')
                     ->badge()
-                    ->color(function($record) {
-                        if($record->payment) {
+                    ->color(function ($record) {
+                        if ($record->payment) {
                             return $record->payment->status === 'paid' ? 'success' : 'warning';
                         }
                         return 'warning';
@@ -299,16 +340,52 @@ class AppointmentResource extends Resource
                 return $query->whereRaw('1 = 0');
             })
 
+            ->filters([
+                Filter::make('date')
+                    ->form([
+                        DatePicker::make('date')
+                            ->default(null),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        if(!isset($data['date'])) {
+                            return $query;
+                        }
+                        return $query
+                            ->whereHas('schedule', function ($schedulequery) use ($data) 
+                            {
+                                 $schedulequery->where('date', '=', $data['date']);
+                            });
+                    }),
+                
+                    SelectFilter::make('status')
+                    ->options([
+                        'pending' => 'Pending',
+                        'booked' => 'Booked',
+                        'cancelled' => 'Cancelled',
+                        'completed' => 'Completed',
+                    ])
+                    ->label('Status')
+                    ->query(function (Builder $query, array $data) {
+                        return $query->when(
+                            !empty($data['value']),
+                            fn ($query) => $query->where('status', $data['value'])
+                        );
+                    }),
+                
+
+            ])
+
+
             ->actions([
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\ViewAction::make(),
                     Tables\Actions\EditAction::make(),
                     Tables\Actions\DeleteAction::make()->hidden(fn($record) => $record->status === 'completed' || $record->status === 'booked' && Auth::user()->role === 'patient')
-                    ->action(function ($record) {
-                        $record->slot->is_booked = false;
-                        $record->slot->save();
-                        $record->delete();
-                    }),
+                        ->action(function ($record) {
+                            $record->slot->is_booked = false;
+                            $record->slot->save();
+                            $record->delete();
+                        }),
 
                     Action::make('Payment')
                         ->label('Pay')
@@ -317,9 +394,9 @@ class AppointmentResource extends Resource
                         })
                         ->color('warning')
                         ->icon('heroicon-s-credit-card')
-                        ->visible(fn($record) => $record->status === 'booked' || ($record->status === 'booked' && $record->payment->status === 'unpaid')),
+                        ->visible(fn($record) => $record->status=='pending'|| $record->status === 'booked' || ($record->status === 'booked' && $record->payment->status === 'unpaid')),
 
-                        Action::make('SPayment')
+                    Action::make('SPayment')
                         ->label('Pay via Stripe')
                         ->action(function ($record) {
                             // $url = url('docbook/appointments/stripe-payment/{record}', ['id'=> $record->payment->id]);
@@ -328,7 +405,7 @@ class AppointmentResource extends Resource
                         })
                         ->color('success')
                         ->icon('heroicon-s-credit-card')
-                        ->visible(fn($record) => $record->status === 'booked' || ($record->status === 'booked' && $record->payment->status === 'unpaid')),
+                        ->visible(fn($record) => $record->status=='pending' || $record->status === 'booked' || ($record->status === 'booked' && $record->payment->status === 'unpaid')),
 
                     Action::make('Give_Review')
                         ->label('Give a Review')
@@ -397,7 +474,7 @@ class AppointmentResource extends Resource
                             $record->update([
                                 'status' => 'cancelled',
                             ]);
-                            
+
                             $record->slot->is_booked = false;
                             $record->slot->save();
                             Notification::make()
@@ -422,7 +499,8 @@ class AppointmentResource extends Resource
 
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make()
+                    ->visible(fn(): bool => Auth::user()->role === 'admin'),
                 ]),
             ]);
     }
@@ -446,55 +524,55 @@ class AppointmentResource extends Resource
                         return $patient ? $patient->user->name : 'Unknown'; // Return name or fallback
                     }),
 
-                    TextEntry::make('doctor_id')
+                TextEntry::make('doctor_id')
                     ->label('Doctor Name')
                     ->getStateUsing(function ($record) {
                         $doctor = Doctor::find($record->doctor_id);
                         return $doctor ? $doctor->user->name : 'Unknown'; // Return name or fallback
                     }),
 
-                    TextEntry::make('service_id')
+                TextEntry::make('service_id')
                     ->label('Service')
                     ->getStateUsing(function ($record) {
                         $service = Service::find($record->service_id);
                         return $service ? $service->name : 'Unknown'; // Return name or fallback
                     }),
 
-                    TextEntry::make('schedule_id')
+                TextEntry::make('schedule_id')
                     ->label('Date')
                     ->getStateUsing(function ($record) {
                         $schedule = Schedule::find($record->schedule_id);
                         return $schedule ? Carbon::parse($schedule->date)->format('d-m-Y') : 'Unknown';
                     }),
 
-                    TextEntry::make('slot_id')
+                TextEntry::make('slot_id')
                     ->label('Start Time')
                     ->getStateUsing(function ($record) {
                         $slot = Slot::find($record->slot_id);
                         return $slot ? Carbon::parse($slot->start_time)->format('' . 'H:i') : 'Unknown';
                     }),
 
-                    TextEntry::make('slot_id')
+                TextEntry::make('slot_id')
                     ->label('End Time')
                     ->getStateUsing(function ($record) {
                         $slot = Slot::find($record->slot_id);
                         return $slot ? Carbon::parse($slot->end_time)->format('' . 'H:i') : 'Unknown';
                     }),
 
-                    TextEntry::make('status')
+                TextEntry::make('status')
                     ->label('Status')
                     ->getStateUsing(function ($record) {
                         return $record->status;
                     }),
 
-                    TextEntry::make('description')
+                TextEntry::make('description')
                     ->label('Description')
                     ->getStateUsing(function ($record) {
                         return $record->description;
                     }),
 
-                    ImageEntry::make('prescription')
-                    ->label('Prescription')   
+                ImageEntry::make('prescription')
+                    ->label('Prescription')
                     ->getStateUsing(function ($record) {
                         return $record->prescription
                             ? asset('storage/' . $record->prescription)
@@ -516,4 +594,5 @@ class AppointmentResource extends Resource
 
         ];
     }
+
 }

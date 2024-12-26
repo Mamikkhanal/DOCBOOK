@@ -23,17 +23,19 @@ class AppointmentsChart extends ChartWidget
         $query = Appointment::query();
 
         if ($user->role === 'doctor') {
-            // Filter appointments for this doctor
-            $query->where('doctor_id', $user->doctor->id);
+         
+            $query = $query->where('doctor_id', $user->doctor->id);
+
         } elseif ($user->role === 'patient') {
-            // Filter appointments for this patient
-            $query->where('patient_id', $user->patient->id);
+            
+           $query = $query->where('patient_id', $user->patient->id);
+
         } elseif ($user->role === 'admin') {
-            // Admins see all appointments (no filtering needed)
+            $query;
         }
 
         // Query the database for appointments grouped by month
-        $appointments = Appointment::selectRaw('strftime("%m", created_at) as month, COUNT(*) as count')
+        $appointments = $query->selectRaw('strftime("%m", created_at) as month, COUNT(*) as count')
             ->groupBy('month')
             ->orderBy('month')
             ->get();
@@ -61,4 +63,5 @@ class AppointmentsChart extends ChartWidget
     {
         return 'line';
     }
+
 }

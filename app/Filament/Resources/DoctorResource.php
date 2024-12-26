@@ -25,7 +25,7 @@ class DoctorResource extends Resource
 
     protected static ?string $navigationGroup = 'Profiles';
 
-    
+
     protected static ?string $navigationGroupIcon = 'heroicon-s-user';
 
     public static function form(Form $form): Form
@@ -36,7 +36,7 @@ class DoctorResource extends Resource
                     ->required()
                     ->numeric()
                     ->disabled(true),
-                    Forms\Components\Select::make('specialization')
+                Forms\Components\Select::make('specialization')
                     ->label('Specialization')
                     ->options(
                         Specialization::pluck('name', 'name') // Assuming you have a Specialization model with 'name' and 'id' columns
@@ -52,6 +52,10 @@ class DoctorResource extends Resource
                         }
                     })
                     ->required(),
+                Forms\Components\Toggle::make('is_available')
+                    ->required()
+                    ->default(true),
+
             ]);
     }
 
@@ -75,7 +79,18 @@ class DoctorResource extends Resource
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
-            ->modifyQueryUsing(fn (Builder $query): Builder => $query->where('user_id', Auth::user()?->id))
+            ->modifyQueryUsing(function (Builder $query): Builder {
+                $user = Auth::user();
+
+                // Check if the user is an admin
+                if ($user && $user->role === 'admin') {
+                    // If admin, return all records
+                    return $query;
+                }
+
+                // If not admin, filter by user_id
+                return $query->where('user_id', $user?->id);
+            })
             ->filters([
                 //
             ])
@@ -85,7 +100,8 @@ class DoctorResource extends Resource
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make()
+                    ->visible(fn(): bool => Auth::user()->role === 'admin'),
                 ]),
             ]);
     }
@@ -107,6 +123,6 @@ class DoctorResource extends Resource
 
             // The bulk actions that are available for the table
         ];
-                // The 'delete' bulk action will delete all selected doctors
+        // The 'delete' bulk action will delete all selected doctors
     }
 }

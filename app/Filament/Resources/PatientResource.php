@@ -69,7 +69,8 @@ class PatientResource extends Resource
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make()
+                    ->visible(fn(): bool => Auth::user()->role === 'admin'),
                 ]),
             ]);
     }

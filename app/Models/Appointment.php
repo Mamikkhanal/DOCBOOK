@@ -8,11 +8,10 @@ class Appointment extends Model
 {
     protected  $guarded = [];
     protected $casts = [
-        'date' => 'datetime:d-m-Y',
+        'date' => 'date:d-m-Y',
         'start_time' => 'datetime:H:i', // Cast to time format
         'end_time' => 'datetime:H:i',
     ];
-    
 
     public function doctor(){
         return $this->belongsTo(Doctor::class);
@@ -27,7 +26,7 @@ class Appointment extends Model
     }
 
     public function schedule(){
-        return $this->hasOne(Schedule::class);
+        return $this->belongsTo(Schedule::class);
     }
 
     public function slot(){

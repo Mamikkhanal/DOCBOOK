@@ -8,7 +8,9 @@ use App\Models\Payment;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
 use Filament\Resources\Resource;
+use Filament\Tables\Filters\Filter;
 use Illuminate\Support\Facades\Auth;
+use Filament\Forms\Components\DatePicker;
 use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Resources\PaymentResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -49,8 +51,13 @@ class PaymentResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('user_id')
+                    ->label('Patient Name')
+                    ->getStateUsing(function ($record) {
+                        return $record->appointment->patient->user->name;
+                    })
                     ->numeric()
-                    ->sortable(),
+                    ->sortable()
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('appointment_id')
                     ->numeric()
                     ->sortable(),
@@ -89,15 +96,28 @@ class PaymentResource extends Resource
             })
             
             ->filters([
-                //
+                Filter::make('created_at')
+                    ->form([
+                        DatePicker::make('created_at')
+                            ->default(null),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        if(!isset($data['created_at'])) {
+                            return $query;
+                        }
+                        return $query
+                            ->whereDate('created_at', '=', $data['created_at']);
+                    })
             ])
+
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make()
+                    ->visible(fn(): bool => Auth::user()->role === 'admin'),
                 ]),
             ]);
     }

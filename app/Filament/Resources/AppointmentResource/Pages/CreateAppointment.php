@@ -4,6 +4,8 @@ namespace App\Filament\Resources\AppointmentResource\Pages;
 
 use App\Models\Slot;
 use Filament\Actions;
+use App\Models\Payment;
+use App\Models\Service;
 use App\Models\Schedule;
 use App\Models\Appointment;
 use Illuminate\Support\Facades\Auth;
@@ -11,6 +13,7 @@ use Filament\Notifications\Notification;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Validation\ValidationException;
 use App\Filament\Resources\AppointmentResource;
+use App\Models\Patient;
 
 class CreateAppointment extends CreateRecord
 {
@@ -58,6 +61,21 @@ class CreateAppointment extends CreateRecord
             $slot->is_booked = true;
             $slot->save();
         }
+    }
+
+    protected function afterCreate()
+    {
+        $appointment= $this->record;
+        
+        Payment::create([
+            'amount' => Service::find($appointment['service_id'])->price,
+            'appointment_id' => $appointment['id'],
+            'service_id' => $appointment['service_id'],
+            'user_id' => Patient::find($appointment['patient_id'])->user_id,
+            'status' => 'unpaid',
+        ]);
+
+        
     }
 
     public function getRedirectUrl(): string

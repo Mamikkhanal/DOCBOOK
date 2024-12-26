@@ -93,6 +93,13 @@ class StripePayment extends Page
             'pid' => $request->stripeToken,
         ]);
 
+        $appointment = Appointment::find($payment->appointment_id);
+        if($appointment->status == 'pending') {
+            $appointment->update([
+                'status' => 'booked',
+            ]);
+        }
+
         // Return with success notification
         return redirect()->route('filament.admin.resources.payments.index')->with('success', 'Payment successfully done!');
     }

@@ -13,11 +13,6 @@ class AppointmentStatusChart extends ChartWidget
 
     protected static ?string $maxHeight = '180px';
 
-//     public static function canView(): bool
-// {
-//     return Auth::user()->role === 'admin';
-// }
-
     protected function getData(): array
     {
         // Query the database to get counts for each status

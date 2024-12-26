@@ -11,7 +11,7 @@
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
     </head>
 
-    {{-- <body class="h-screen bg-left bg-no-repeat bg-cover bg-[url('{{ asset('/images/welcome.png') }}')]">
+    <body class="h-screen bg-left bg-no-repeat bg-cover bg-[url('{{ asset('/images/welcome.png') }}')]">
         <div>
             <header class="absolute inset-x-0 top-0 z-50 ">
                 <nav class="flex items-center justify-between p-6 lg:px- 8" aria-label="Global">
@@ -125,6 +125,6 @@
                 </div>
             </footer>
 
-    </body> --}}
+    </body>
 
     </html>

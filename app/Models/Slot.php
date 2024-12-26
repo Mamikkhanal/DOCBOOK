@@ -9,7 +9,7 @@ class Slot extends Model
     protected  $guarded = [];
 
     protected $casts = [
-        'date' => 'datetime:d-m-Y',
+        'date' => 'date:d-m-Y',
         'start_time' => 'datetime:H:i', // Cast to time format
         'end_time' => 'datetime:H:i',
     ];
@@ -21,4 +21,5 @@ class Slot extends Model
     public function schedule(){
         return $this->belongsTo(Schedule::class);
     }
+
 }

@@ -20,6 +20,7 @@ class Register extends BaseRegister
                         $this->getEmailFormComponent(),
                         $this->getPasswordFormComponent(),
                         $this->getPasswordConfirmationFormComponent(),
+                        
                         $this->getRoleFormComponent(),
                         $this->getSpecializationFormComponent(),
                         $this->getAgeFormComponent(),
@@ -59,4 +60,6 @@ class Register extends BaseRegister
             ->required()
             ->numeric();
     }
+
+    
 }

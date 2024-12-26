@@ -9,7 +9,7 @@ class Schedule extends Model
     protected  $guarded = [];
 
     protected $casts = [
-        'date' => 'datetime:d-m-Y',
+        'date' => 'date:d-m-Y',
         'start_time' => 'datetime:H:i', // Cast to time format
         'end_time' => 'datetime:H:i',
     ];
@@ -21,8 +21,9 @@ class Schedule extends Model
 
     public function appointment()
     {
-        return $this->belongsTo(Appointment::class);
+        return $this->hasMany(Appointment::class);
     }
+
 
 
     public function slots(){

@@ -2,13 +2,16 @@
 
 namespace App\Filament\Resources;
 
+use Carbon\Carbon;
 use Filament\Forms;
 use Filament\Tables;
 use App\Models\Schedule;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
 use Filament\Resources\Resource;
+use Filament\Tables\Filters\Filter;
 use Illuminate\Support\Facades\Auth;
+use Filament\Forms\Components\DatePicker;
 use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Resources\ScheduleResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -47,17 +50,27 @@ class ScheduleResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('doctor_id')
-                    ->numeric()
-                    // ->hidden(fn($record): bool => $record->doctor_id !== Auth::user()?->doctor?->id)
-                    ->sortable(),
+                // Tables\Columns\TextColumn::make('schedule_id')
+                //     ->numeric()
+                //     ->sortable()
+                //     ->label('Schedule'),
                 Tables\Columns\TextColumn::make('date')
                     ->date()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('start_time')
-                ->time(),
+                    ->time()
+                    ->formatStateUsing(function ($state) {
+                        return Carbon::parse($state)->format('H:i');
+                    })
+                    ->sortable(),
+
                 Tables\Columns\TextColumn::make('end_time')
-                ->time(),
+                    ->time()
+                    ->formatStateUsing(function ($state) {
+                        return Carbon::parse($state)->format('H:i');
+                    })
+                    ->sortable(),
+
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -71,9 +84,22 @@ class ScheduleResource extends Resource
             ->modifyQueryUsing(
                 fn(Builder $query): Builder => $query->where('doctor_id', Auth::user()?->doctor?->id)
             )
+            
             ->filters([
-                //
+                Filter::make('date')
+                    ->form([
+                        DatePicker::make('date')
+                            ->default(null),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        if(!isset($data['date'])) {
+                            return $query;
+                        }
+                        return $query
+                            ->whereDate('date', '=', $data['date']);
+                    })
             ])
+
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
@@ -81,7 +107,8 @@ class ScheduleResource extends Resource
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make()
+                        ->visible(fn(): bool => Auth::user()->role === 'doctor'),
                 ]),
             ]);
     }

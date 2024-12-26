@@ -4,6 +4,7 @@ namespace App\Policies;
 
 use App\Models\Review;
 use App\Models\User;
+use GuzzleHttp\Psr7\Request;
 use Illuminate\Auth\Access\Response;
 
 class ReviewPolicy
@@ -33,6 +34,9 @@ class ReviewPolicy
     public function create(User $user): bool
     {
         if($user->role == 'patient') {
+            if(!request()->query('appointment_id')) {
+                return false;
+            }
             return true;
         }
         return false;
