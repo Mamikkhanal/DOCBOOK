@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('schedules', function (Blueprint $table) {
             $table->id();
+            $table->string('slug')->unique();
             $table->foreignId('doctor_id')->references('id')->on('doctors')->onDelete('cascade');
             $table->date('date');
             $table->time('start_time');

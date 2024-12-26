@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('appointments', function (Blueprint $table) {
             $table->id();
+            $table->string('slug')->unique();
             $table->foreignId('patient_id')->references('id')->on('patients');
             $table->foreignId('doctor_id')->references('id')->on('doctors');
             $table->foreignId('service_id')->references('id')->on('services');

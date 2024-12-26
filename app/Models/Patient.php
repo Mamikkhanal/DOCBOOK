@@ -2,11 +2,34 @@
 
 namespace App\Models;
 
+use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
 
 class Patient extends Model
 {
     protected  $guarded = [];
+
+    public static function boot()
+    {
+        parent::boot();
+        
+        static::creating(function ($user) {
+            $user->slug = Str::random(16);
+        });
+
+        static::deleting(function ($patient) {
+            // Ensure the associated User is deleted when the Patient is deleted
+            if ($patient->user) {
+                $patient->user->delete();
+            }
+        });
+        
+    }
+
+    public function getRouteKeyName(){
+        return 'slug';
+    }
+
 
     public function appointments()
     {
@@ -17,17 +40,6 @@ class Patient extends Model
         return $this->belongsTo(User::class);
     }
 
-    protected static function boot()
-    {
-        parent::boot();
-
-        static::deleting(function ($patient) {
-            // Ensure the associated User is deleted when the Patient is deleted
-            if ($patient->user) {
-                $patient->user->delete();
-            }
-        });
-    }
 
    /**
      * Scope a query to include only users created in the current week.

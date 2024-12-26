@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
 
 class Appointment extends Model
@@ -12,6 +13,20 @@ class Appointment extends Model
         'start_time' => 'datetime:H:i', // Cast to time format
         'end_time' => 'datetime:H:i',
     ];
+
+    public static function boot()
+    {
+        parent::boot();
+        
+        static::creating(function ($appointment) {
+            $appointment->slug = Str::random(16);
+        });
+        
+    }
+
+    public function getRouteKeyName(){
+        return 'slug';
+    }
 
     public function doctor(){
         return $this->belongsTo(Doctor::class);

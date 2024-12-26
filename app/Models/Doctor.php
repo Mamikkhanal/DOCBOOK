@@ -2,11 +2,33 @@
 
 namespace App\Models;
 
+use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
 
 class Doctor extends Model
 {
     protected  $guarded = [];
+
+    public static function boot()
+    {
+        parent::boot();
+        
+        static::creating(function ($doctor) {
+            $doctor->slug = Str::random(16);
+        });
+
+        static::deleting(function ($doctor) {
+            if ($doctor->user) {
+                $doctor->user->delete();
+            }
+        });
+        
+    }
+
+    public function getRouteKeyName(){
+        return 'slug';
+    }
+
 
     public function user()
     {
@@ -25,18 +47,6 @@ class Doctor extends Model
     public function specializations()
     {
         return $this->hasOne(Specialization::class);
-    }
-
-    protected static function boot()
-    {
-        parent::boot();
-
-        static::deleting(function ($doctor) {
-            // Ensure the associated User is deleted when the Doctor is deleted
-            if ($doctor->user) {
-                $doctor->user->delete();
-            }
-        });
     }
 
     /**

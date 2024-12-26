@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('slots', function (Blueprint $table) {
             $table->id();
+            $table->string('slug')->unique();
             $table->foreignId('schedule_id')->references('id')->on('schedules')
             ->onDelete('cascade');
             $table->boolean('is_booked')->default(false);
