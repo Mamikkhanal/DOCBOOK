@@ -2,12 +2,13 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Pages\Auth\RegisterPage;
+use App\Filament\Pages\UpdateProfile;
 use Filament\Pages;
 use Filament\Panel;
 use Filament\Widgets;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
-use App\Filament\Pages\Auth\RegisterUser;
 use Filament\Http\Middleware\Authenticate;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Cookie\Middleware\EncryptCookies;
@@ -22,7 +23,6 @@ use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use App\Filament\Widgets\StatsOverview;
 use App\Filament\Widgets\AppointmentsChart;
 use App\Filament\Widgets\AppointmentStatusChart;
-use Filament\Pages\Auth\Register;
 class AdminPanelProvider extends PanelProvider
 {
     public function panel(Panel $panel): Panel
@@ -32,8 +32,8 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path(path: 'docbook')
             ->login()
-            ->registration(Register::class)
-            ->profile()
+            ->registration(RegisterPage::class)
+            ->profile(UpdateProfile::class)
             ->colors([
                 'danger' => Color::Rose,
                 // 'gray'=> Color::Gray,

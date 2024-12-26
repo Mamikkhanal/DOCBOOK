@@ -388,7 +388,7 @@ class AppointmentResource extends Resource
                         }),
 
                     Action::make('Payment')
-                        ->label('Pay')
+                        ->label('Pay via Esewa')
                         ->action(function ($record) {
                             return redirect(route('payment.pay', ['id' => $record->payment->id]));
                         })
