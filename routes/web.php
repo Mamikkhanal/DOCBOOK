@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\RegistrationController;
 use App\Filament\Resources\PaymentResource\Pages\StripePayment;
+use App\Http\Controllers\SpecializationSuggestionController;
 
 
 
@@ -21,3 +22,6 @@ Route::get('/payments/success', [PaymentController::class, 'success'])->name('pa
 Route::get('/payments/failure', [PaymentController::class, 'failure'])->name('payment.failure');
 
 Route::post('stripe/create-charge/{payment}', [StripePayment::class, 'createCharge'])->name('stripe.create-charge');
+
+
+Route::post('/specialization-suggestion', [SpecializationSuggestionController::class, 'suggestSpecialization']);

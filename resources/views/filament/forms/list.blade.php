@@ -1,19 +1,33 @@
-<table class="table-auto w-full">
-    <thead>
-        <tr>
-            <!-- Loop through the columns to display table headers -->
-            @foreach($columns as $column)
-                <th class="px-4 py-2 text-left">{{ ucfirst($column) }}</th>
-            @endforeach
-        </tr>
-    </thead>
-    <tbody>
-        <!-- Loop through the rows to display each schedule's data -->
-        @foreach($rows as $row)
-            <tr>
-                <td class="px-4 py-2">{{ \Carbon\Carbon::parse($row['date'])->format('l, F j, Y') }}</td> <!-- Format the date -->
-                <td class="px-4 py-2">{{ \Carbon\Carbon::parse($row['start_time'])->format('h:i A') }} - {{ \Carbon\Carbon::parse($row['end_time'])->format('h:i A') }}</td> <!-- Format start and end time --
-            </tr>
+<div class="faq-section">
+    <h2 class="text-xl font-bold mb-4">Frequently Asked Questions</h2>
+
+    <div class="faq-list">
+        @foreach ($data as $index => $faq)
+            <div class="faq-item border-b border-gray-200 py-4">
+                <button 
+                    class="faq-question w-full text-left text-md font-medium text-gray-700 hover:text-blue-600 focus:outline-none"
+                    onclick="toggleAnswer({{ $index }})"
+                >
+                    {{ $faq['pain'] }}
+                </button>
+                <div 
+                    id="faq-answer-{{ $index }}" 
+                    class="faq-answer mt-2 text-gray-600 hidden"
+                >
+                    <p>{{ $faq['specialization'] }}</p>
+                </div>
+            </div>
         @endforeach
-    </tbody>
-</table>
+    </div>
+</div>
+
+<script>
+    function toggleAnswer(index) {
+        const answer = document.getElementById(`faq-answer-${index}`);
+        if (answer.classList.contains('hidden')) {
+            answer.classList.remove('hidden');
+        } else {
+            answer.classList.add('hidden');
+        }
+    }
+</script>

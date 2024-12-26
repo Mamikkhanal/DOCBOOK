@@ -91,6 +91,7 @@ class DoctorResource extends Resource
                 // If not admin, filter by user_id
                 return $query->where('user_id', $user?->id);
             })
+            ->defaultSort('created_at', 'desc')
             ->filters([
                 //
             ])

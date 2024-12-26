@@ -128,6 +128,7 @@ class UserResource extends Resource
             
                 return $query; // Default case, if needed
             })
+            ->defaultSort('created_at', 'desc')
             ->filters([
                 //
             ])

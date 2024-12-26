@@ -21,6 +21,7 @@ class CreateAppointment extends CreateRecord
 
     protected function mutateFormDataBeforeCreate(array $data): array
     {
+        unset($data['problem']);
         if (!isset($data['patient_id'])) {
             $data['patient_id'] = Auth::user()->patient->id;
         }

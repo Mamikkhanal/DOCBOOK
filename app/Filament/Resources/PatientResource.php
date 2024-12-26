@@ -60,6 +60,7 @@ class PatientResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->modifyQueryUsing(fn (Builder $query): Builder => $query->where('user_id', Auth::user()?->id))
+            ->defaultSort('created_at', 'desc')
             ->filters([
                 //
             ])

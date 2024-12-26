@@ -5,6 +5,7 @@ namespace App\Filament\Pages\Auth;
 use App\Models\Doctor;
 use App\Models\Patient;
 use App\Models\Specialization;
+use Faker\Provider\ar_EG\Text;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Component;
 use Filament\Forms\Components\Field;
@@ -27,12 +28,31 @@ class RegisterPage extends BaseRegister
                         $this->getPhoneFormComponent(),
                         $this->getPasswordFormComponent(),
                         $this->getPasswordConfirmationFormComponent(),
-                        $this->getRoleFormComponent(),
-                        $this->getSpecializationFormComponent()
-                        ->visible(fn (): bool => $this->data['role'] == 'doctor'),
-                        $this->getAgeFormComponent()
-                        ->visible(fn (): bool => $this->data['role'] == 'patient'),
+
+                        Select::make('role')
+                            ->options([
+                                'patient' => 'Patient',
+                                'doctor' => 'Doctor',
+                            ])
+                            ->reactive(),
+                        
+                        Fieldset::make('Age')
+                        ->schema([
+                            TextInput::make('age')
+                            ])
+                        ->visible(
+                            fn () => $this->data['role'] === 'patient'),
+
+                        Fieldset::make('Specialization')
+                            ->schema([
+                                Select::make('specialization')
+                                    ->options(Specialization::all()->pluck('name', 'id'))
+                                ])
+                            ->visible(
+                                fn () => $this->data['role'] === 'doctor'),
+
                     ])
+
                     ->statePath('data'),
             ),
         ];
@@ -64,7 +84,7 @@ class RegisterPage extends BaseRegister
     {
         return
         Fieldset::make('Specialization')
-        ->relationship('doctorcreate')
+        // ->relationship('doctorcreate')
          ->schema([
             Select::make('specialization')
                 ->options(Specialization::all()->pluck('name', 'id'))
@@ -78,31 +98,31 @@ class RegisterPage extends BaseRegister
             ->required();
     }
 
-    protected function mutateFormDataBeforeSave(array $data): array
+    protected function mutateFormDataBeforeCreate(array $data): array
     {
-        unset($this->data['specialization']);
-        unset($this->data['age']);
+        // Exclude age and specialization when inserting into the 'users' table
+        unset($data['age'], $data['specialization']);
         return $data;
     }
-    protected function afterSave (array $data): void
+    
+    protected function afterRegister()
     {
-        if ($data['role'] == 'patient') {
+        $user = $this->form->model;
+    
+        if ($user->role === 'patient') {
+            // Save patient-specific data
             Patient::create([
-                'user_id' => $data['id'],
-                'age' => $data['age'],
+                'user_id' => $user->id,
+                'age' => $this->data['age'], // Get the age from the form state
             ]);
-            unset($data['age']);
-            unset($data['specialization']);
-        }
-        if($data['role'] == 'doctor') {
+        } elseif ($user->role === 'doctor') {
+            // Save doctor-specific data
             Doctor::create([
-                'user_id' => $data['id'],
-                'specialization' => $data['specialization'],
+                'user_id' => $user->id,
+                'specialization' => $this->data['specialization'], // Get specialization from the form state
             ]);
-            unset($data['specialization']);
-            unset($data['age']);
         }
     }
-
+    
 
 }

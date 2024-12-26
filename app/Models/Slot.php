@@ -30,7 +30,7 @@ class Slot extends Model
     }
 
     public function appointment(){
-        return $this->belongsTo(Appointment::class);
+        return $this->hasOne(Appointment::class);
     }
 
     public function schedule(){

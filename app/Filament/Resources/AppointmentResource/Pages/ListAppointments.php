@@ -40,6 +40,18 @@ class ListAppointments extends ListRecords
                 })
                 
                 ->badge(function() {
+                    if(Auth::user()->role == 'patient') {
+                        return Appointment::where('patient_id', Auth::user()->patient->id)->whereHas('schedule', function ($scheduleQuery) {
+                            $scheduleQuery->where('date', '>', Carbon::now()->format('Y-m-d')); 
+                        })
+                        ->count();
+                    }
+                    elseif(Auth::user()->role == 'doctor') {
+                        return Appointment::where('doctor_id', Auth::user()->doctor->id)->whereHas('schedule', function ($scheduleQuery) {
+                            $scheduleQuery->where('date', '>', Carbon::now()->format('Y-m-d'));
+                        })
+                        ->count();
+                    }
                     return Appointment::whereHas('schedule', function ($scheduleQuery) {
                         $scheduleQuery->where('date', '>', Carbon::now()->format('Y-m-d'));
                     })->count();
@@ -53,6 +65,18 @@ class ListAppointments extends ListRecords
                     });
                 })
                 ->badge(function() {
+                    if(Auth::user()->role == 'patient') {
+                        return Appointment::where('patient_id', Auth::user()->patient->id)->whereHas('schedule', function ($scheduleQuery) {
+                            $scheduleQuery->where('date', '=', Carbon::now()->format('Y-m-d')); 
+                        })
+                        ->count();
+                    }
+                    elseif(Auth::user()->role == 'doctor') {
+                        return Appointment::where('doctor_id', Auth::user()->doctor->id)->whereHas('schedule', function ($scheduleQuery) {
+                            $scheduleQuery->where('date', '=a', Carbon::now()->format('Y-m-d'));
+                        })
+                        ->count();
+                    }
                     return Appointment::whereHas('schedule', function ($scheduleQuery) {
                         $scheduleQuery->where('date', '=', Carbon::now()->format('Y-m-d'));
                     })->count();

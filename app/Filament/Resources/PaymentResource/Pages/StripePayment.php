@@ -55,7 +55,7 @@ class StripePayment extends Page
                 ->send();
 
             // Perform the redirection without returning it from mount
-            $this->redirectRoute('filament.admin.resources.payments.index');
+            $this->redirectRoute('filament.admin.resources.appointments.index');
             return; // Ensure no further processing happens
         }
 
@@ -67,7 +67,7 @@ class StripePayment extends Page
                 ->send();
 
             // Perform the redirection without returning it from mount
-            $this->redirectRoute('filament.admin.resources.payments.index');
+            $this->redirectRoute('filament.admin.resources.appointments.index');
             return; // Ensure no further processing happens
         }
 
@@ -101,6 +101,11 @@ class StripePayment extends Page
         }
 
         // Return with success notification
-        return redirect()->route('filament.admin.resources.payments.index')->with('success', 'Payment successfully done!');
+        Notification::make()
+        ->title('Payment Successful')
+        ->body('Payment successfully done!')
+        ->success()
+        ->send();
+        return redirect()->route('filament.admin.resources.appointments.index')->with('success', 'Payment successfully done!');
     }
 }

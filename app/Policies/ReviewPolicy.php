@@ -25,6 +25,9 @@ class ReviewPolicy
         if($review->appointment->patient->user->id == $user->id || $review->appointment->doctor->user->id == $user->id) {
             return true;
         }
+        elseif($user->role == 'admin') {
+            return true;
+        }
         return false;
     }
 
@@ -34,9 +37,9 @@ class ReviewPolicy
     public function create(User $user): bool
     {
         if($user->role == 'patient') {
-            if(!request()->query('appointment_id')) {
-                return false;
-            }
+            // if(!request()->query('appointment_id')) {
+            //     return false;
+            // }
             return true;
         }
         return false;

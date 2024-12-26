@@ -105,6 +105,7 @@ class ReviewResource extends Resource
                 // Default: No records for unauthorized users
                 return $query->whereRaw('0 = 1');
             })
+            ->defaultSort('created_at', 'desc')
             
             
 
@@ -169,7 +170,7 @@ class ReviewResource extends Resource
         return [
             'index' => Pages\ListReviews::route('/'),
             'create' => Pages\CreateReview::route('/create'),
-            'view' => Pages\ViewReview::route('/{record}'),
+            'view' => Pages\ViewReview::route('/review/{record}'),
             'edit' => Pages\EditReview::route('/{record}/edit'),
         ];
     }

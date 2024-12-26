@@ -45,7 +45,7 @@ class Appointment extends Model
     }
 
     public function slot(){
-        return $this->hasOne(Slot::class);
+        return $this->belongsTo(Slot::class);
     }
 
     public function payment(){

@@ -32,6 +32,7 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path(path: 'docbook')
             ->login()
+            ->favicon(asset('images/logo.png'))
             ->registration(RegisterPage::class)
             ->profile(UpdateProfile::class)
             ->colors([

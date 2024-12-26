@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Resources\PaymentResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\PaymentResource\RelationManagers;
+use Filament\Forms\Components\Toggle;
 
 class PaymentResource extends Resource
 {
@@ -59,18 +60,30 @@ class PaymentResource extends Resource
                     ->sortable()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('appointment_id')
-                    ->numeric()
-                    ->sortable(),
+                ->label('Appointment')
+                ->getStateUsing(function ($record) {
+                    return $record->appointment->patient->user->name .' '. ' '.'to'.' '.' '. $record->appointment->doctor->user->name;
+                }),
                 Tables\Columns\TextColumn::make('service_id')
-                    ->numeric()
-                    ->sortable(),
+                ->label('Service')
+                    ->getStateUsing(function ($record) {
+                        return $record->service->name;
+                    }),
                 Tables\Columns\TextColumn::make('pid')
-                    ->searchable(),
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('amount') 
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('status')
-                    ->searchable(),
+                    ->searchable()
+                    ->badge()
+                    ->color(function ($record) {
+                        if ($record) {
+                            return $record->status === 'paid' ? 'success' : 'warning';
+                        }
+                        return 'warning';
+                    }),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -94,6 +107,7 @@ class PaymentResource extends Resource
                 // Default case: restrict query if no role matches
                 return $query->whereNull('id'); // Return no results
             })
+            ->defaultSort('created_at', 'desc')
             
             ->filters([
                 Filter::make('created_at')

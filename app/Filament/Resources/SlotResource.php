@@ -117,6 +117,7 @@ class SlotResource extends Resource
                             ->whereDate('date', '=', $data['date']);
                     })
             ])
+            ->defaultSort('created_at', 'desc')
 
             ->actions([
                 Tables\Actions\ViewAction::make(),
