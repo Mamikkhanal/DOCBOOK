@@ -457,7 +457,7 @@ class AppointmentResource extends Resource
                         ->requiresConfirmation()
                         ->color('primary')
                         ->icon('heroicon-s-archive-box-x-mark')
-                        ->hidden(fn($record) => $record->status === 'cancelled' || $record->status === 'booked' || $record->status === 'completed' || Auth::user()->role == 'patient'),
+                        ->hidden(fn($record) => $record->status === 'cancelled' || $record->status === 'booked' || $record->status === 'completed' || Auth::user()->role == 'patient' ?? true),
 
                     Action::make('Book')
                         ->label('Book')
@@ -484,7 +484,7 @@ class AppointmentResource extends Resource
                         ->requiresConfirmation()
                         ->color('gray')
                         ->icon('heroicon-s-check-badge')
-                        ->hidden(fn($record) => $record->status === 'booked' || $record->status === 'completed' || $record->status === 'cancelled' || Auth::user()->role == 'patient'),
+                        ->hidden(fn($record) => $record->status === 'booked' || $record->status === 'completed' || $record->status === 'cancelled' || Auth::user()->role == 'patient' ?? true),
 
                     Action::make('Complete')
                         ->label('Complete')
@@ -501,7 +501,7 @@ class AppointmentResource extends Resource
                         ->requiresConfirmation()
                         ->color('gray')
                         ->icon('heroicon-s-arrow-up-on-square')
-                        ->hidden(fn($record) => $record->status === 'pending' || $record->status === 'completed' || $record->status === 'cancelled' || (!$record->payment || $record->payment->status === 'unpaid') || Auth::user()->role == 'patient'),
+                        ->hidden(fn($record) => $record->status === 'pending' || $record->status === 'completed' || $record->status === 'cancelled' || (!$record->payment || $record->payment->status === 'unpaid') || Auth::user()->role == 'patient' ?? true),
 
                     Action::make('Payment')
                         ->label('Pay via Esewa')
@@ -510,7 +510,7 @@ class AppointmentResource extends Resource
                         })
                         ->color('gray')
                         ->icon('heroicon-s-credit-card')
-                        ->visible(fn($record) => $record->payment->status === 'unpaid'),
+                        ->visible(fn($record) => $record->payment->status === 'unpaid' ?? false),
 
                     Action::make('SPayment')
                         ->label('Pay via Stripe')
@@ -521,7 +521,7 @@ class AppointmentResource extends Resource
                         })
                         ->color('gray')
                         ->icon('heroicon-s-credit-card')
-                        ->visible(fn($record) => $record->payment->status === 'unpaid'),
+                        ->visible(fn($record) => $record->payment->status === 'unpaid' ?? false),
                     // ->visible(fn($record) => $record->status == 'pending' || $record->status === 'booked' || ($record->status === 'booked' && $record->payment->status === 'unpaid')),
 
                     Action::make('Give_Review')
@@ -556,7 +556,7 @@ class AppointmentResource extends Resource
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make()
-                        ->visible(fn(): bool => Auth::user()->role === 'admin'),
+                        ->hidden(),
                 ]),
             ]);
     }

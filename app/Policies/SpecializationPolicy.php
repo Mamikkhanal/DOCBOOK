@@ -4,6 +4,7 @@ namespace App\Policies;
 
 use App\Models\Specialization;
 use App\Models\User;
+use Filament\Notifications\Notification;
 use Illuminate\Auth\Access\Response;
 
 class SpecializationPolicy
@@ -49,6 +50,15 @@ class SpecializationPolicy
      */
     public function delete(User $user, Specialization $specialization): bool
     {
+        if($specialization->doctors->count() > 0) {
+            // Notification::make()
+            // ->danger()
+            // ->title('Cannot Delete')
+            // ->body('Cannot delete specialization because it is associated with at least one doctor')
+            // ->send();
+            return false;
+
+        }
         return true;
     }
 

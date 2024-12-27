@@ -137,7 +137,7 @@ class SlotResource extends Resource
                     ->requiresConfirmation()
                     ->color('success')
                     ->icon('heroicon-s-check-badge')
-                    ->visible(fn($record) => !$record->is_booked && Auth::user()->role === 'doctor'),
+                    ->hidden(),
 
                 Action::make('Unbook')
                     ->label('Unbook')

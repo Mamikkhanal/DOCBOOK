@@ -44,9 +44,9 @@ class Doctor extends Model
     {
         return $this->hasMany(Schedule::class);
     }
-    public function specializations()
+    public function specialization()
     {
-        return $this->hasOne(Specialization::class);
+        return $this->belongsTo(Specialization::class);
     }
 
     /**

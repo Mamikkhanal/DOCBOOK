@@ -119,7 +119,7 @@ class RegisterPage extends BaseRegister
             // Save doctor-specific data
             Doctor::create([
                 'user_id' => $user->id,
-                'specialization' => $this->data['specialization'], // Get specialization from the form state
+                'specialization_id' => $this->data['specialization'], // Get specialization from the form state
             ]);
         }
     }

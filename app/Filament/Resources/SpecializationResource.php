@@ -53,11 +53,13 @@ class SpecializationResource extends Resource
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make()
+                ->disabled(fn($record)=> $record->doctors()->count() > 0),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make()
-                    ->visible(fn(): bool => Auth::user()->role === 'admin'),
+                    ->hidden(),
                 ]),
             ]);
     }

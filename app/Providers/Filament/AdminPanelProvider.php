@@ -32,8 +32,8 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->spa(true)
             ->path(path: 'docbook')
+            ->favicon(asset('logo.ico'))
             ->login()
-            ->favicon(asset('images/logo.png'))
             ->registration(RegisterPage::class)
             ->profile(UpdateProfile::class)
             ->colors([
@@ -49,7 +49,6 @@ class AdminPanelProvider extends PanelProvider
                 'green'=>'#1e5c21'
             ])
             ->brandName('DOCBOOK')
-            ->favicon('images/logo.png')
             ->brandLogo(asset('images/logo.png'))
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')

@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('slug')->unique();
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-            $table->string('specialization');
+            $table->foreignId('specialization_id')->references('id')->on('specializations')->onDelete('cascade');
             $table->boolean('is_available')->default(true);
             $table->timestamps();
         });

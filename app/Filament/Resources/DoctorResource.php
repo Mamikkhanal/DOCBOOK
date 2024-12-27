@@ -66,7 +66,7 @@ class DoctorResource extends Resource
                 Tables\Columns\TextColumn::make('user_id')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('specialization')
+                Tables\Columns\TextColumn::make('specialization.name')
                     ->searchable(),
                 Tables\Columns\IconColumn::make('is_available')
                     ->boolean(),
@@ -102,7 +102,7 @@ class DoctorResource extends Resource
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make()
-                    ->visible(fn(): bool => Auth::user()->role === 'admin'),
+                    ->hidden(),
                 ]),
             ]);
     }
