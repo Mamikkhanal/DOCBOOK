@@ -185,11 +185,11 @@ class AppointmentResource extends Resource
                             ->helperText('Describe your health problem in detail to get a specialization suggestion.'),
 
                         // Submit Button
-                            Forms\Components\Actions::make([
-                                Forms\Components\Actions\Action::make('Suggest')
+                        Forms\Components\Actions::make([
+                            Forms\Components\Actions\Action::make('Suggest')
                                 ->action('suggestSpecialization')
                                 ->color('primary'),
-                            ]),
+                        ]),
 
                     ]),
                 ]),
@@ -287,17 +287,17 @@ class AppointmentResource extends Resource
                     })
                     ->toggleable(isToggledHiddenByDefault: true),
 
-                    Tables\Columns\TextColumn::make('status')
-                        ->searchable()
-                        ->badge()
-                        ->color(function ($record) {
-                            return match ($record->status) {
-                                'booked' => 'success',
-                                'pending' => 'warning',
-                                'cancelled' => 'danger',
-                                'completed' => 'success',
-                            };
-                        }),
+                Tables\Columns\TextColumn::make('status')
+                    ->searchable()
+                    ->badge()
+                    ->color(function ($record) {
+                        return match ($record->status) {
+                            'booked' => 'success',
+                            'pending' => 'gray',
+                            'cancelled' => 'primary',
+                            'completed' => 'success',
+                        };
+                    }),
 
                 Tables\Columns\TextColumn::make('schedule_id')
                     ->label('Date')
@@ -325,7 +325,7 @@ class AppointmentResource extends Resource
                     ->badge()
                     ->color(function ($record) {
                         if ($record->payment) {
-                            return $record->payment->status === 'paid' ? 'success' : 'warning';
+                            return $record->payment->status === 'paid' ? 'success' : 'primary';
                         }
                         return 'warning';
                     })
@@ -388,7 +388,7 @@ class AppointmentResource extends Resource
                 // Default to no results if the role doesn't match (optional, you can adjust this)
                 return $query->whereRaw('1 = 0');
             })
-        ->defaultSort('created_at', 'desc')
+            ->defaultSort('created_at', 'desc')
 
             ->filters([
                 Filter::make('date')
@@ -423,28 +423,29 @@ class AppointmentResource extends Resource
 
 
             ])
-            
-            
+
+
             ->actions([
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\ViewAction::make()
-                    ->color('primary'),
+                        ->color('primary'),
                     Tables\Actions\EditAction::make()
-                    ->color('primary'),
+                        ->color('primary'),
                     Tables\Actions\DeleteAction::make()->hidden(fn($record) => $record->status === 'completed' || $record->status === 'booked' && Auth::user()->role === 'patient')
-                    ->action(function ($record) {
-                        $record->slot->is_booked = false;
-                        $record->slot->save();
-                        $record->delete();
-                    }),    
-                    
+                        ->action(function ($record) {
+                            $record->slot->is_booked = false;
+                            $record->slot->save();
+                            $record->delete();
+                        })
+                        ->color('primary'),
+
                     Action::make('Cancel')
                         ->label('Cancel')
                         ->action(function ($record) {
                             $record->update([
                                 'status' => 'cancelled',
                             ]);
-        
+
                             // Mail::to($record->patient->user->email)->send(new \App\Mail\CancelledMail($record));
                             $record->slot->is_booked = false;
                             $record->slot->save();
@@ -454,94 +455,94 @@ class AppointmentResource extends Resource
                                 ->send();
                         })
                         ->requiresConfirmation()
-                        ->color('danger')
+                        ->color('primary')
                         ->icon('heroicon-s-archive-box-x-mark')
                         ->hidden(fn($record) => $record->status === 'cancelled' || $record->status === 'booked' || $record->status === 'completed' || Auth::user()->role == 'patient'),
-        
-                    Action::make('Payment')    
-                    ->label('Pay via Esewa')
-                        ->action(function ($record) {
-                            return redirect(route('payment.pay', ['id' => $record->payment->id]));
-                        })    
-                        ->color('gray')
-                        ->icon('heroicon-s-credit-card')
-                        ->visible(fn($record) => $record->payment->status === 'unpaid'),
 
-                    Action::make('SPayment')    
-                        ->label('Pay via Stripe')
-                        ->action(function ($record) {
-                            // $url = url('docbook/appointments/stripe-payment/{record}', ['id'=> $record->payment->id]);
-                            // return $url;
-                            return redirect(route('filament.admin.resources.appointments.stripePayment', ['record' => $record->id]));
-                        })    
-                        ->color('gray')
-                        ->icon('heroicon-s-credit-card')
-                        ->visible(fn($record) => $record->payment->status === 'unpaid'),
-                        // ->visible(fn($record) => $record->status == 'pending' || $record->status === 'booked' || ($record->status === 'booked' && $record->payment->status === 'unpaid')),
-
-                    Action::make('Give_Review')    
-                        ->label('Give a Review')
-                        ->action(function ($record) {
-                            return redirect(route('filament.admin.resources.reviews.create', ['appointment_id' => $record->id]));
-                        })    
-                        ->color('primary')
-                        ->icon('heroicon-s-chat-bubble-left-ellipsis')
-                        ->visible(fn($record) => $record->status === 'completed' && Auth::user()->role === 'patient' && !Review::where('appointment_id', $record->id)->exists()),
-
-                    Action::make('View_Review')    
-                        ->label('View Review')
-                        ->action(function ($record) {
-                            $review = Review::where('appointment_id', $record->id)->first();
-                            return redirect(route('filament.admin.resources.reviews.view', ['record' => $review->id]));
-                        })    
-                        ->color('primary')
-                        ->icon('heroicon-s-chat-bubble-left-ellipsis')
-                        ->visible(fn($record) => $record->status === 'completed' && Auth::user()->role === 'patient' && Review::where('appointment_id', $record->id)->exists()),
-
-                    Action::make('Book')    
+                    Action::make('Book')
                         ->label('Book')
                         ->action(function ($record) {
                             $record->update([
                                 'status' => 'booked',
-                            ]);    
+                            ]);
                             // Mail::to($record->patient->user->email)->send(new \App\Mail\BookedMail($record));
-                            if(!$record->payment) {
+                            if (!$record->payment) {
                                 Payment::create([
                                     'amount' => Service::find($record->service_id)->price,
                                     'appointment_id' => $record->id,
                                     'service_id' => $record->service_id,
                                     'user_id' => $record->patient->user_id,
                                     'status' => 'unpaid',
-                                ]);      
-                            }    
+                                ]);
+                            }
 
                             Notification::make()
                                 ->title('Appointment Booked!')
                                 ->success()
                                 ->send();
-                        })        
+                        })
                         ->requiresConfirmation()
                         ->color('gray')
                         ->icon('heroicon-s-check-badge')
                         ->hidden(fn($record) => $record->status === 'booked' || $record->status === 'completed' || $record->status === 'cancelled' || Auth::user()->role == 'patient'),
 
-                    Action::make('Complete')    
+                    Action::make('Complete')
                         ->label('Complete')
                         ->action(function ($record) {
                             $record->update([
                                 'status' => 'completed',
-                            ]);    
+                            ]);
 
                             Notification::make()
                                 ->title('Appointment Completed!')
                                 ->success()
                                 ->send();
-                        })        
+                        })
                         ->requiresConfirmation()
                         ->color('gray')
                         ->icon('heroicon-s-arrow-up-on-square')
                         ->hidden(fn($record) => $record->status === 'pending' || $record->status === 'completed' || $record->status === 'cancelled' || (!$record->payment || $record->payment->status === 'unpaid') || Auth::user()->role == 'patient'),
-    
+
+                    Action::make('Payment')
+                        ->label('Pay via Esewa')
+                        ->action(function ($record) {
+                            return redirect(route('payment.pay', ['id' => $record->payment->id]));
+                        })
+                        ->color('gray')
+                        ->icon('heroicon-s-credit-card')
+                        ->visible(fn($record) => $record->payment->status === 'unpaid'),
+
+                    Action::make('SPayment')
+                        ->label('Pay via Stripe')
+                        ->action(function ($record) {
+                            // $url = url('docbook/appointments/stripe-payment/{record}', ['id'=> $record->payment->id]);
+                            // return $url;
+                            return redirect(route('filament.admin.resources.appointments.stripePayment', ['record' => $record->id]));
+                        })
+                        ->color('gray')
+                        ->icon('heroicon-s-credit-card')
+                        ->visible(fn($record) => $record->payment->status === 'unpaid'),
+                    // ->visible(fn($record) => $record->status == 'pending' || $record->status === 'booked' || ($record->status === 'booked' && $record->payment->status === 'unpaid')),
+
+                    Action::make('Give_Review')
+                        ->label('Give a Review')
+                        ->action(function ($record) {
+                            return redirect(route('filament.admin.resources.reviews.create', ['appointment_id' => $record->id]));
+                        })
+                        ->color('primary')
+                        ->icon('heroicon-s-chat-bubble-left-ellipsis')
+                        ->visible(fn($record) => $record->status === 'completed' && Auth::user()->role === 'patient' && !Review::where('appointment_id', $record->id)->exists()),
+
+                    Action::make('View_Review')
+                        ->label('View Review')
+                        ->action(function ($record) {
+                            $review = Review::where('appointment_id', $record->id)->first();
+                            return redirect(route('filament.admin.resources.reviews.view', ['record' => $review->id]));
+                        })
+                        ->color('primary')
+                        ->icon('heroicon-s-chat-bubble-left-ellipsis')
+                        ->visible(fn($record) => $record->status === 'completed' && Auth::user()->role === 'patient' && Review::where('appointment_id', $record->id)->exists()),
+
 
 
                 ])->label('Actions')

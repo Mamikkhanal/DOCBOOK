@@ -51,8 +51,8 @@ class AppointmentsChart extends ChartWidget
                 [
                     'label' => 'Appointments Created',
                     'data' => array_values($monthlyCounts),
-                    'backgroundColor' => '#36A2EB',
-                    'borderColor' => '#9BD0F5',
+                    // 'backgroundColor' => '#7f1d1d',
+                    // 'borderColor' => '#7f1d1d',
                 ],
             ],
             'labels' => ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],

@@ -69,19 +69,19 @@ class StatsOverview extends BaseWidget
                 ->description("Growth {$userGrowth}%")
                 ->descriptionIcon($userGrowth > 0 ? 'heroicon-m-arrow-trending-up' : 'heroicon-m-arrow-trending-down')
                 ->chart([7, 2, 10, 3, 15, 4, 17])
-                ->color($userGrowth > 0 ? 'success' : 'danger'),
+                ->color($userGrowth > 0 ? 'green' : 'primary'),
 
             Stat::make('Doctors', Doctor::count())
                 ->description("Growth {$doctorGrowth}%")
                 ->descriptionIcon($doctorGrowth > 0 ? 'heroicon-m-arrow-trending-up' : 'heroicon-m-arrow-trending-down')
                 ->chart([7, 2, 10, 3, 15, 4, 17])
-                ->color($doctorGrowth > 0 ? 'success' : 'danger'),
+                ->color($doctorGrowth > 0 ? 'green' : 'primary'),
 
             Stat::make('Patients', Patient::count())
                 ->description("Growth {$patientGrowth}%")
                 ->descriptionIcon($patientGrowth > 0 ? 'heroicon-m-arrow-trending-up' : 'heroicon-m-arrow-trending-down')
                 ->chart([7, 2, 10, 3, 15, 4, 17])
-                ->color($patientGrowth > 0 ? 'success' : 'danger'),
+                ->color($patientGrowth > 0 ? 'green' : 'primary'),
         ];
     }
 }

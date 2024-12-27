@@ -73,7 +73,7 @@ class ListAppointments extends ListRecords
                     }
                     elseif(Auth::user()->role == 'doctor') {
                         return Appointment::where('doctor_id', Auth::user()->doctor->id)->whereHas('schedule', function ($scheduleQuery) {
-                            $scheduleQuery->where('date', '=a', Carbon::now()->format('Y-m-d'));
+                            $scheduleQuery->where('date', '=', Carbon::now()->format('Y-m-d'));
                         })
                         ->count();
                     }
@@ -88,14 +88,14 @@ class ListAppointments extends ListRecords
                     return $query->where('status', 'pending');
                 })
                 ->badge(fn() => $this->getCount('pending'))
-                ->badgeColor('warning'),
+                ->badgeColor('primary'),
 
             Tab::make('Booked')
                 ->modifyQueryUsing(function (Builder $query) {
                     return $query->where('status', 'booked');
                 })
                 ->badge(fn() => $this->getCount('booked'))
-                ->badgeColor('success'),
+                ->badgeColor('primary'),
 
             Tab::make('Completed')
                 ->modifyQueryUsing(function (Builder $query) {
@@ -109,7 +109,7 @@ class ListAppointments extends ListRecords
                     return $query->where('status', 'cancelled');
                 })
                 ->badge(fn() => $this->getCount('cancelled'))
-                ->badgeColor('danger'),
+                ->badgeColor('primary'),
 
 
         ];

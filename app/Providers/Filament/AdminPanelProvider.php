@@ -30,6 +30,7 @@ class AdminPanelProvider extends PanelProvider
         return $panel
             ->default()
             ->id('admin')
+            ->spa(true)
             ->path(path: 'docbook')
             ->login()
             ->favicon(asset('images/logo.png'))
@@ -45,6 +46,7 @@ class AdminPanelProvider extends PanelProvider
                 'success' => Color::Emerald,
                 'warning' => Color::Orange,
                 'action_btn'=> '#1e3a8a',
+                'green'=>'#1e5c21'
             ])
             ->brandName('DOCBOOK')
             ->favicon('images/logo.png')

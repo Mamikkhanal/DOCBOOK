@@ -37,8 +37,8 @@ class AppointmentStatusChart extends ChartWidget
                 [
                     'label' => 'Appointments',
                     'data' => $data,
-                    'backgroundColor' => ['#FFA500', '#36A2EB', '#4CAF50', '#FF6384'], // Colors for each status
-                    'borderColor' => ['#FFC107', '#9BD0F5', '#81C784', '#FF9AA2'], // Border colors
+                    'backgroundColor' => ['#1e3a8a', 'gray', '#1e5c21', '#7f1d1d'], // Colors for each status
+                    // 'borderColor' => ['#FFC107', '#9BD0F5', '#81C784', '#FF9AA2'], // Border colors
                 ],
             ],
         ];
