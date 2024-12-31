@@ -24,4 +24,4 @@ Route::get('/payments/failure', [PaymentController::class, 'failure'])->name('pa
 Route::post('stripe/create-charge/{payment}', [StripePayment::class, 'createCharge'])->name('stripe.create-charge');
 
 
-Route::post('/specialization-suggestion', [SpecializationSuggestionController::class, 'suggestSpecialization']);
+Route::post('/specialization-suggestion', [SpecializationSuggestionController::class, 'suggestSpecialization'])->name('specialization-suggestion');

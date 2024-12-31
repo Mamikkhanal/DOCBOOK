@@ -3,7 +3,10 @@
 namespace App\Filament\Resources\AppointmentResource\Pages;
 
 use App\Models\Slot;
+use App\Models\User;
 use Filament\Actions;
+use App\Models\Doctor;
+use App\Models\Patient;
 use App\Models\Payment;
 use App\Models\Service;
 use App\Models\Schedule;
@@ -13,7 +16,6 @@ use Filament\Notifications\Notification;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Validation\ValidationException;
 use App\Filament\Resources\AppointmentResource;
-use App\Models\Patient;
 
 class CreateAppointment extends CreateRecord
 {
@@ -76,7 +78,14 @@ class CreateAppointment extends CreateRecord
             'status' => 'unpaid',
         ]);
 
-        
+        $patient = Auth::user();
+        $doctor_id = Doctor::find($appointment['doctor_id'])->user_id;
+        $doctor = User::find($doctor_id);
+        $users = [$patient, $doctor];
+        Notification::make()
+            ->success()
+            ->body('Your appointment has been created successfully.')
+            ->sendToDatabase($users);
     }
 
     public function getRedirectUrl(): string

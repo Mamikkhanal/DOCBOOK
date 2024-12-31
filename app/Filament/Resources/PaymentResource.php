@@ -29,21 +29,6 @@ class PaymentResource extends Resource
     {
         return $form
             ->schema([
-                // Forms\Components\Hidden::make('user_id')
-                //     ->required()
-                //     ->numeric(),
-                // Forms\Components\Hidden::make('appointment_id')
-                //     ->required()
-                //     ->numeric(),
-                // Forms\Components\Hidden::make('service_id')
-                //     ->required()
-                //     ->numeric(),
-                // Forms\Components\Hidden::make('pid'),
-                // Forms\Components\Hidden::make('amount')
-                //     ->required()
-                //     ->numeric(),
-                // Forms\Components\Hidden::make('status')
-                //     ->required(),
             ]);
     }
 

@@ -149,7 +149,8 @@ class SlotResource extends Resource
                         Notification::make()
                             ->title('Slot Unbooked!')
                             ->success()
-                            ->send();
+                            ->send()
+                            ->sendToDatabase($record->schedule->doctor->user);
                     })
                     ->requiresConfirmation()
                     ->color('danger')

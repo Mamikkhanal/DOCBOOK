@@ -31,6 +31,8 @@ class AdminPanelProvider extends PanelProvider
             ->default()
             ->id('admin')
             ->spa(true)
+            ->databaseNotifications()
+            ->databaseNotificationsPolling('3s')
             ->path(path: 'docbook')
             ->favicon(asset('logo.ico'))
             ->login()
